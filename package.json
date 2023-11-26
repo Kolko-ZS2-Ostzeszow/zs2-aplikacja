@@ -7,7 +7,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "ts:check": "tsc"
+    "ts:check": "tsc",
+    "prepare": "husky install",
+    "prettify": "prettier --cache . --write"
   },
   "dependencies": {
     "@types/react": "~18.2.14",
@@ -19,6 +21,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "husky": "^8.0.3",
     "prettier": "^3.1.0"
   },
   "private": true
