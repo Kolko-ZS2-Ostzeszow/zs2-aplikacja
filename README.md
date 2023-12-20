@@ -4,7 +4,7 @@
 ### Pierwsze pobranie
 ```
 npm i
-npm prepare
+npm run prepare
 ```
 
 ### Uruchomienie aplikacji
