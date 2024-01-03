@@ -7,6 +7,8 @@ export default function App() {
   let [schedule, setSchedule] = useState<ScheduleData>();
 
   fetchEdupageData().then((data) => setSchedule(data));
+  // przykład wyciągania danych
+  //schedule.lessons.filter((lesson) => lesson.classIds == schedule.classes.find((klasa) => klasa.name == "4TP").id);
 
   return (
     <View style={styles.container}>
