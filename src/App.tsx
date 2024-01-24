@@ -49,6 +49,7 @@ export default function App() {
           renderItem={({ item, index }) => {
             return (
               <View style={{ marginTop: 24 }}>
+                <Text>{schedule.hours[index].startTime + "-" + schedule.hours[index].endTime}</Text>
                 <Lesson id={index + 1} lessonName={item} />
               </View>
             );
