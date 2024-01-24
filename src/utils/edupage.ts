@@ -19,7 +19,7 @@ export class ScheduleData {
   groups: { id: number; name: string; classId: number; entireClass: boolean }[];
 }
 
-const Days = [
+export const Days = [
   { short: "Pn", name: "Poniedziałek" },
   { short: "Wt", name: "Wtorek" },
   { short: "Śr", name: "Środa" },
@@ -28,11 +28,20 @@ const Days = [
 ];
 
 export async function fetchEdupageData() {
+  let timetableId = (
+    await (
+      await fetch("https://zs2ostrzeszow.edupage.org/timetable/server/ttviewer.js?__func=getTTViewerData", {
+        method: "POST",
+        body: JSON.stringify({ __args: [null, new Date().getFullYear() - 1], __gsh: "00000000" })
+      })
+    ).json()
+  ).r.regular.default_num;
+
   let fetchedData = await fetch(
     "https://zs2ostrzeszow.edupage.org/timetable/server/regulartt.js?__func=regularttGetData",
     {
       method: "POST",
-      body: JSON.stringify({ __args: [null, "201"], __gsh: "00000000" })
+      body: JSON.stringify({ __args: [null, timetableId], __gsh: "00000000" })
     }
   );
 
