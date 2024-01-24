@@ -32,7 +32,7 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View
         style={{
           paddingTop: Platform.OS === "android" ? 25 : 0,
@@ -57,7 +57,7 @@ export default function App() {
       )}
 
       <StatusBar style="light" />
-    </SafeAreaView>
+    </View>
   );
 }
 
