@@ -9,12 +9,12 @@ export class ScheduleData {
     id: number;
     subjectId: number;
     teacherId: number;
-    groupIds: number;
-    classIds: number;
+    groupIds: number[];
+    classIds: number[];
     duration: number;
-    classroomIds: number;
-    hourIds: number;
-    dayIds: number;
+    classroomIds: number[];
+    hourIds: number[];
+    dayIds: number[];
   }[];
   groups: { id: number; name: string; classId: number; entireClass: boolean }[];
 }
@@ -41,7 +41,7 @@ export async function fetchEdupageData() {
     "https://zs2ostrzeszow.edupage.org/timetable/server/regulartt.js?__func=regularttGetData",
     {
       method: "POST",
-      body: JSON.stringify({ __args: [null, timetableId], __gsh: "00000000" })
+      body: JSON.stringify({ __args: [null, timetableId.toString()], __gsh: "00000000" })
     }
   );
 
@@ -102,7 +102,7 @@ export async function fetchEdupageData() {
         groupids: string[];
         classids: string[];
         durationperiods: number;
-        classroomidss: string[];
+        //classroomidss: string[];
       }) => {
         let id = parseInt(data.id.slice(data.id.includes("*") ? 1 : 0, data.id.length));
 
@@ -124,8 +124,10 @@ export async function fetchEdupageData() {
             return parseInt(classId.slice(classId.includes("*") ? 1 : 0, classId.length));
           }),
           duration: data.durationperiods,
-          classroomIds: data.classroomidss.map((classroomId) => {
-            return parseInt(classroomId.slice(classroomId.includes("*") ? 1 : 0, classroomId.length));
+          classroomIds: cards.map((data: { classroomids: string[] }) => {
+            data.classroomids.map((classroomId) => {
+              return parseInt(classroomId.slice(classroomId.includes("*") ? 1 : 0, classroomId.length));
+            });
           }),
           hourIds: cards.map((data: { period: string }) => parseInt(data.period) - 1),
           dayIds: cards.map((data: { days: string }) => {

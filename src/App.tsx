@@ -18,14 +18,19 @@ export default function App() {
   if (schedule != undefined) {
     const classId = schedule.classes.find((klasa) => klasa.name == "4TP").id;
     lessonNames = schedule.lessons
-      .filter((lesson) => lesson.classIds == classId && lesson.dayIds == 1)
+      .filter((lesson) => {
+        return lesson.classIds.includes(classId) && lesson.dayIds.includes(1);
+      })
       .sort((a, b) => {
-        return a.hourIds - b.hourIds;
+        const hourIndexA = a.dayIds.indexOf(1);
+        const hourIndexB = b.dayIds.indexOf(1);
+
+        return a.hourIds[hourIndexA] - b.hourIds[hourIndexB];
       })
       .flatMap((data) => {
         let names = [];
         for (let i = 0; i < data.duration; i++) {
-          names[i] = schedule.subjects.filter((subject) => subject.id == data.subjectId)[0].name;
+          names[i] = schedule.subjects.find((subject) => subject.id == data.subjectId).name;
         }
         return names;
       });
@@ -48,7 +53,7 @@ export default function App() {
           data={lessonNames}
           renderItem={({ item, index }) => {
             return (
-              <View style={{ marginTop: 24 }}>
+              <View style={{ marginTop: 12, marginBottom: 12 }}>
                 <Text>{schedule.hours[index].startTime + "-" + schedule.hours[index].endTime}</Text>
                 <Lesson id={index + 1} lessonName={item} />
               </View>
