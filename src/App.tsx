@@ -4,6 +4,8 @@ import { ScheduleData, fetchEdupageData } from "./utils/edupage";
 import { useEffect, useState } from "react";
 import Lesson from "./components/lesson";
 import { Accent1 } from "./theme";
+import { Dropdown } from 'react-native-element-dropdown';
+import DropdownComponent from "./components/dropdown";
 
 export default function App() {
   let [schedule, setSchedule] = useState<ScheduleData>();
@@ -16,10 +18,16 @@ export default function App() {
   //schedule.lessons.filter((lesson) => lesson.classIds == schedule.classes.find((klasa) => klasa.name == "4TP").id);
   let lessonNames: string[] = [];
   if (schedule != undefined) {
-    const classId = schedule.classes.find((klasa) => klasa.name == "4TP").id;
+    const classId = schedule.classes.find((klasa) => klasa.name == "2PS").id;
+    const groupId = schedule.groups.filter((grupa) => grupa.classId == classId);
+    const zgrupa = groupId.find(grupa => grupa.id == 261); // grupa zawodowa
+    const jgrupa = groupId.find(grupa => grupa.id == 253); // grupa językowa 
+    // cała klasa lesson.groupIds.includes(groupId[0].id)
+    // console.log(groupId); // aby wyświetlić wszystkie grupy, zmień klase u góry aby pokazać jej grupy
     lessonNames = schedule.lessons
       .filter((lesson) => {
-        return lesson.classIds.includes(classId) && lesson.dayIds.includes(1);
+        // return lesson.classIds.includes(classId) && lesson.dayIds.includes(1);
+        return (lesson.groupIds.includes(zgrupa.id) || lesson.groupIds.includes(groupId[0].id) || lesson.groupIds.includes(jgrupa.id)) && lesson.dayIds.includes(1);
       })
       .sort((a, b) => {
         const hourIndexA = a.dayIds.indexOf(1);
@@ -46,7 +54,9 @@ export default function App() {
           borderBottomLeftRadius: 16,
           borderBottomRightRadius: 16
         }}
-      ></View>
+      >
+        <DropdownComponent></DropdownComponent>
+      </View>
       {schedule == undefined && <Text style={{ alignSelf: "center", padding: "20%", fontSize: 36 }}>Ładowanie...</Text>}
       {schedule != undefined && (
         <FlatList
