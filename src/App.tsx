@@ -112,7 +112,7 @@ export default function App() {
         }}
       >
         <DropdownComponent data={classes} setExternalValue={setSelectedClass}></DropdownComponent>
-        <MultiDropdownComponent data={classGroups} setExternalValue={setSelectedGroups}></MultiDropdownComponent>
+        <MultiDropdownComponent data={classGroups} setExternalValue={setSelectedGroups} placeholder="Wybierz grupę"></MultiDropdownComponent>
       </View>
       {schedule == undefined && <Text style={{ alignSelf: "center", padding: "20%", fontSize: 36 }}>Ładowanie...</Text>}
       {schedule != undefined && (
