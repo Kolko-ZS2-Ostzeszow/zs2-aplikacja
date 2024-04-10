@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { FlatList, Platform, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { FlatList, Platform, RefreshControl, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { ScheduleData, fetchEdupageData } from "./utils/edupage";
 import { useEffect, useState } from "react";
 import Lesson from "./components/lesson";
@@ -7,6 +7,7 @@ import { Accent1 } from "./theme";
 import { Dropdown } from "react-native-element-dropdown";
 import DropdownComponent from "./components/dropdown";
 import MultiDropdownComponent from "./components/multi_dropdown";
+import React from "react";
 
 export default function App() {
   let [schedule, setSchedule] = useState<ScheduleData>();
@@ -14,6 +15,14 @@ export default function App() {
   let [lessonsData, setLessonsData] = useState<{ hourId: number; name: string }[]>([]);
   let [classGroups, setClassGroups] = useState<{ label: string; value: number }[]>([]);
   let [selectedGroups, setSelectedGroups] = useState<number[]>([]);
+  let [refreshing, setRefreshing] = useState<boolean>(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   useEffect(() => {
     fetchEdupageData().then((data) => setSchedule(data));
@@ -39,17 +48,17 @@ export default function App() {
         schedule.lessons
           .filter((lesson) => {
             // return lesson.classIds.includes(classId) && lesson.dayIds.includes(1);
-            return lesson.groupIds.some((id) => [...selectedGroups, groupId].includes(id)) && lesson.dayIds.includes(2);
+            return lesson.groupIds.some((id) => [...selectedGroups, groupId].includes(id)) && lesson.dayIds.includes(0);
           })
           .sort((a, b) => {
-            const hourIndexA = a.dayIds.indexOf(2);
-            const hourIndexB = b.dayIds.indexOf(2);
+            const hourIndexA = a.dayIds.indexOf(0);
+            const hourIndexB = b.dayIds.indexOf(0);
 
             return a.hourIds[hourIndexA] - b.hourIds[hourIndexB];
           })
           .flatMap((obj) => {
             let data: { hourId: number; name: string }[] = [];
-            const hourId = obj.hourIds[obj.dayIds.indexOf(2)];
+            const hourId = obj.hourIds[obj.dayIds.indexOf(0)];
             for (let i = 0; i < obj.duration; i++) {
               data[i] = {
                 hourId: hourId + i,
@@ -134,6 +143,7 @@ export default function App() {
               </View>
             );
           }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}></RefreshControl>}
         />
       )}
 
