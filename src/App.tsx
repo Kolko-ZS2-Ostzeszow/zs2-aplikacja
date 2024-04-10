@@ -11,7 +11,7 @@ import MultiDropdownComponent from "./components/multi_dropdown";
 export default function App() {
   let [schedule, setSchedule] = useState<ScheduleData>();
   let [selectedClass, setSelectedClass] = useState<number>(null);
-  let [lessonNames, setLessonNames] = useState<string[]>([]);
+  let [lessonsData, setLessonsData] = useState<{ hourId: number; name: string }[]>([]);
   let [classGroups, setClassGroups] = useState<{ label: string; value: number }[]>([]);
   let [selectedGroups, setSelectedGroups] = useState<number[]>([]);
 
@@ -35,24 +35,28 @@ export default function App() {
     if (schedule != undefined) {
       const classId = schedule.classes.find((klasa) => klasa.id == selectedClass).id;
       const groupId = schedule.groups.find((grupa) => grupa.classId == classId && grupa.entireClass).id;
-      setLessonNames(
+      setLessonsData(
         schedule.lessons
           .filter((lesson) => {
             // return lesson.classIds.includes(classId) && lesson.dayIds.includes(1);
-            return lesson.groupIds.some((id) => [...selectedGroups, groupId].includes(id)) && lesson.dayIds.includes(1);
+            return lesson.groupIds.some((id) => [...selectedGroups, groupId].includes(id)) && lesson.dayIds.includes(2);
           })
           .sort((a, b) => {
-            const hourIndexA = a.dayIds.indexOf(1);
-            const hourIndexB = b.dayIds.indexOf(1);
+            const hourIndexA = a.dayIds.indexOf(2);
+            const hourIndexB = b.dayIds.indexOf(2);
 
             return a.hourIds[hourIndexA] - b.hourIds[hourIndexB];
           })
-          .flatMap((data) => {
-            let names = [];
-            for (let i = 0; i < data.duration; i++) {
-              names[i] = schedule.subjects.find((subject) => subject.id == data.subjectId).name;
+          .flatMap((obj) => {
+            let data: { hourId: number; name: string }[] = [];
+            const hourId = obj.hourIds[obj.dayIds.indexOf(2)];
+            for (let i = 0; i < obj.duration; i++) {
+              data[i] = {
+                hourId: hourId + i,
+                name: schedule.subjects.find((subject) => subject.id == obj.subjectId).name
+              };
             }
-            return names;
+            return data;
           })
       );
     }
@@ -117,12 +121,12 @@ export default function App() {
       {schedule == undefined && <Text style={{ alignSelf: "center", padding: "20%", fontSize: 36 }}>Ładowanie...</Text>}
       {schedule != undefined && (
         <FlatList
-          data={lessonNames}
+          data={lessonsData}
           renderItem={({ item, index }) => {
             return (
               <View style={{ marginTop: 12, marginBottom: 12 }}>
-                <Text>{schedule.hours[index].startTime + "-" + schedule.hours[index].endTime}</Text>
-                <Lesson id={index + 1} lessonName={item} />
+                <Text>{schedule.hours[item.hourId].startTime + "-" + schedule.hours[item.hourId].endTime}</Text>
+                <Lesson id={item.hourId + 1} lessonName={item.name} />
               </View>
             );
           }}
