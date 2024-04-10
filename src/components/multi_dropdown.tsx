@@ -5,6 +5,7 @@ import { Dropdown, MultiSelect } from "react-native-element-dropdown";
 interface MultiDropdownProps {
   data: { label: string; value: number }[];
   setExternalValue: (value: number[]) => void;
+  placeholder: string;
 }
 
 const MultiDropdownComponent = (props: MultiDropdownProps) => {
@@ -22,7 +23,7 @@ const MultiDropdownComponent = (props: MultiDropdownProps) => {
       maxHeight={300}
       labelField="label"
       valueField="value"
-      placeholder="Select item"
+      placeholder={props.placeholder}
       searchPlaceholder="Search..."
       value={value}
       onChange={(item) => {
