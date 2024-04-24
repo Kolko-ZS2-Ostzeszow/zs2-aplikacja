@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
-import { FlatList, Platform, RefreshControl, SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { ScheduleData, fetchEdupageData } from "./utils/edupage";
+import { Button, FlatList, Platform, RefreshControl, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Days, ScheduleData, fetchEdupageData } from "./utils/edupage";
 import { useEffect, useState } from "react";
 import Lesson from "./components/lesson";
 import { Accent1 } from "./theme";
@@ -16,6 +16,19 @@ export default function App() {
   let [classGroups, setClassGroups] = useState<{ label: string; value: number }[]>([]);
   let [selectedGroups, setSelectedGroups] = useState<number[]>([]);
   let [refreshing, setRefreshing] = useState<boolean>(false);
+  let [dayId, setDayId] = useState<number>(getBestDayId());
+
+  function getBestDayId(): number {
+    const date = new Date();
+    const day = date.getDay();
+    // monday to friday
+
+    if (day >= 1 && day <= 5) {
+      return day - 1;
+    } else {
+      return 1;
+    }
+  }
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -26,7 +39,7 @@ export default function App() {
 
   useEffect(() => {
     fetchEdupageData().then((data) => setSchedule(data));
-  }, []);
+  });
 
   useEffect(() => {
     if (schedule == undefined) return;
@@ -41,24 +54,26 @@ export default function App() {
   }, [selectedClass]);
 
   useEffect(() => {
-    if (schedule != undefined) {
+    if (schedule != undefined && selectedClass != null) {
       const classId = schedule.classes.find((klasa) => klasa.id == selectedClass).id;
       const groupId = schedule.groups.find((grupa) => grupa.classId == classId && grupa.entireClass).id;
       setLessonsData(
         schedule.lessons
           .filter((lesson) => {
             // return lesson.classIds.includes(classId) && lesson.dayIds.includes(1);
-            return lesson.groupIds.some((id) => [...selectedGroups, groupId].includes(id)) && lesson.dayIds.includes(0);
+            return (
+              lesson.groupIds.some((id) => [...selectedGroups, groupId].includes(id)) && lesson.dayIds.includes(dayId)
+            );
           })
           .sort((a, b) => {
-            const hourIndexA = a.dayIds.indexOf(0);
-            const hourIndexB = b.dayIds.indexOf(0);
+            const hourIndexA = a.dayIds.indexOf(dayId);
+            const hourIndexB = b.dayIds.indexOf(dayId);
 
             return a.hourIds[hourIndexA] - b.hourIds[hourIndexB];
           })
           .flatMap((obj) => {
             let data: { hourId: number; name: string }[] = [];
-            const hourId = obj.hourIds[obj.dayIds.indexOf(0)];
+            const hourId = obj.hourIds[obj.dayIds.indexOf(dayId)];
             for (let i = 0; i < obj.duration; i++) {
               data[i] = {
                 hourId: hourId + i,
@@ -69,7 +84,7 @@ export default function App() {
           })
       );
     }
-  }, [selectedClass, selectedGroups]);
+  }, [selectedClass, selectedGroups, dayId]);
 
   // przykład wyciągania danych
   //schedule.lessons.filter((lesson) => lesson.classIds == schedule.classes.find((klasa) => klasa.name == "4TP").id);
@@ -119,7 +134,7 @@ export default function App() {
         style={{
           paddingTop: Platform.OS === "android" ? 25 : 0,
           backgroundColor: Accent1,
-          height: "20%",
+          height: "30%",
           borderBottomLeftRadius: 16,
           borderBottomRightRadius: 16
         }}
@@ -130,6 +145,27 @@ export default function App() {
           setExternalValue={setSelectedGroups}
           placeholder="Wybierz grupę"
         ></MultiDropdownComponent>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between"
+          }}
+        >
+          <Button
+            title="<-"
+            onPress={() => {
+              setDayId((dayId - 1 + 5) % 5);
+            }}
+          />
+          <Text style={{ fontSize: 24 }}>{schedule != undefined && Days[dayId].name}</Text>
+          <Button
+            title="->"
+            onPress={() => {
+              setDayId((dayId + 1) % 5);
+            }}
+          />
+        </View>
       </View>
       {schedule == undefined && <Text style={{ alignSelf: "center", padding: "20%", fontSize: 36 }}>Ładowanie...</Text>}
       {schedule != undefined && (
