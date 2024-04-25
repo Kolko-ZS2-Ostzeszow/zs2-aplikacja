@@ -9,12 +9,12 @@ export class ScheduleData {
     id: number;
     subjectId: number;
     teacherId: number;
-    groupIds: number[];
+    groupIds: any[];
     classIds: number[];
     duration: number;
-    classroomIds: number[];
-    hourIds: number[];
-    dayIds: number[];
+    classroomId: number | null;
+    hourId: number;
+    dayId: number;
   }[];
   groups: { id: number; name: string; classId: number; entireClass: boolean }[];
 }
@@ -94,7 +94,7 @@ export async function fetchEdupageData() {
         short: data.short
       };
     }),
-    lessons: fetchedJson.r.dbiAccessorRes.tables[18].data_rows.map(
+    lessons: fetchedJson.r.dbiAccessorRes.tables[18].data_rows.flatMap(
       (data: {
         id: string;
         subjectid: string;
@@ -102,8 +102,19 @@ export async function fetchEdupageData() {
         groupids: string[];
         classids: string[];
         durationperiods: number;
-        //classroomidss: string[];
       }) => {
+        let result: {
+          id: number;
+          subjectId: number;
+          teacherId: number;
+          groupIds: any[];
+          classIds: number[];
+          duration: number;
+          classroomId: number | null;
+          hourId: number;
+          dayId: number;
+        }[] = [];
+
         let id = parseInt(data.id.slice(data.id.includes("*") ? 1 : 0, data.id.length));
 
         let cards = fetchedJson.r.dbiAccessorRes.tables[20].data_rows.filter((cardsData: { lessonid: string }) => {
@@ -111,42 +122,60 @@ export async function fetchEdupageData() {
           return parseInt(lessonId.slice(lessonId.includes("*") ? 1 : 0, lessonId.length)) == id;
         });
 
-        return {
-          id: id,
-          subjectId: parseInt(data.subjectid.slice(data.subjectid.includes("*") ? 1 : 0, data.subjectid.length)),
-          teacherId: data.teacherids.map((teacherId) => {
-            return parseInt(teacherId.slice(teacherId.includes("*") ? 1 : 0, teacherId.length));
-          })[0],
-          groupIds: data.groupids.map((groupId) => {
-            return parseInt(groupId.slice(groupId.includes("*") ? 1 : 0, groupId.length));
-          }),
-          classIds: data.classids.map((classId) => {
-            return parseInt(classId.slice(classId.includes("*") ? 1 : 0, classId.length));
-          }),
-          duration: data.durationperiods,
-          classroomIds: cards.map((data: { classroomids: string[] }) => {
-            data.classroomids.map((classroomId) => {
-              return parseInt(classroomId.slice(classroomId.includes("*") ? 1 : 0, classroomId.length));
-            });
-          }),
-          hourIds: cards.map((data: { period: string }) => parseInt(data.period) - 1),
-          dayIds: cards.map((data: { days: string }) => {
-            switch (data.days) {
-              case "10000":
-                return 0;
-              case "01000":
-                return 1;
-              case "00100":
-                return 2;
-              case "00010":
-                return 3;
-              case "00001":
-                return 4;
-              default:
-                return -1;
-            }
-          })
-        };
+        for (let i = 0; i < cards.length; i++) {
+          let card = cards[i];
+          let dayId = -1;
+          switch (card.days) {
+            case "10000":
+              dayId = 0;
+              break;
+            case "01000":
+              dayId = 1;
+              break;
+            case "00100":
+              dayId = 2;
+              break;
+            case "00010":
+              dayId = 3;
+              break;
+            case "00001":
+              dayId = 4;
+              break;
+            default:
+              return -1;
+          }
+
+          let hourId = parseInt(card.period) - 1;
+          let classroomId: number | null = null;
+          if (card.classroomids.length != 0) {
+            let textClassroomId = card.classroomids[0];
+            classroomId = parseInt(
+              textClassroomId.slice(textClassroomId.includes("*") ? 1 : 0, textClassroomId.length)
+            );
+          }
+
+          let cardId = parseInt(card.id.slice(card.id.includes("*") ? 1 : 0, card.id.length));
+
+          result.push({
+            id: cardId,
+            subjectId: parseInt(data.subjectid.slice(data.subjectid.includes("*") ? 1 : 0, data.subjectid.length)),
+            teacherId: data.teacherids.map((teacherId) => {
+              return parseInt(teacherId.slice(teacherId.includes("*") ? 1 : 0, teacherId.length));
+            })[0],
+            groupIds: data.groupids.map((groupId) => {
+              return parseInt(groupId.slice(groupId.includes("*") ? 1 : 0, groupId.length));
+            }),
+            classIds: data.classids.map((classId) => {
+              return parseInt(classId.slice(classId.includes("*") ? 1 : 0, classId.length));
+            }),
+            duration: data.durationperiods,
+            classroomId: classroomId || null,
+            hourId: hourId,
+            dayId: dayId
+          });
+        }
+
+        return result;
       }
     ),
     groups: fetchedJson.r.dbiAccessorRes.tables[15].data_rows.map(

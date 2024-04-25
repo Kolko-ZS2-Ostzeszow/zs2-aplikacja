@@ -78,24 +78,20 @@ function App() {
   useEffect(() => {
     if (!scheduleQuery.isLoading && selectedClass != null) {
       const classId = scheduleQuery.data.classes.find((klasa) => klasa.id == selectedClass).id;
+
       const groupId = scheduleQuery.data.groups.find((grupa) => grupa.classId == classId && grupa.entireClass).id;
       setLessonsData(
         scheduleQuery.data.lessons
           .filter((lesson) => {
             // return lesson.classIds.includes(classId) && lesson.dayIds.includes(1);
-            return (
-              lesson.groupIds.some((id) => [...selectedGroups, groupId].includes(id)) && lesson.dayIds.includes(dayId)
-            );
+            return lesson.groupIds.some((id) => [...selectedGroups, groupId].includes(id)) && lesson.dayId === dayId;
           })
           .sort((a, b) => {
-            const hourIndexA = a.dayIds.indexOf(dayId);
-            const hourIndexB = b.dayIds.indexOf(dayId);
-
-            return a.hourIds[hourIndexA] - b.hourIds[hourIndexB];
+            return a.hourId - b.hourId;
           })
           .flatMap((obj) => {
             let data: { hourId: number; name: string }[] = [];
-            const hourId = obj.hourIds[obj.dayIds.indexOf(dayId)];
+            const hourId = obj.hourId;
             for (let i = 0; i < obj.duration; i++) {
               data[i] = {
                 hourId: hourId + i,
