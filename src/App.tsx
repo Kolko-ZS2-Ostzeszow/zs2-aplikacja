@@ -20,7 +20,19 @@ export default function AppWrapper() {
 }
 
 function App() {
-  const scheduleQuery = useQuery({ queryFn: fetchEdupageData, queryKey: ["schedule"] });
+  const scheduleQuery = useQuery({
+    queryFn: async () => {
+      let data = await fetchEdupageData();
+      setClasses(
+        data.classes.map((klasa) => {
+          return { label: klasa.name, value: klasa.id };
+        })
+      );
+      return data;
+    },
+    queryKey: ["schedule"]
+  });
+  let [classes, setClasses] = useState<{ label: string; value: number }[]>([]);
   let [selectedClass, setSelectedClass] = useState<number>(null);
   let [lessonsData, setLessonsData] = useState<{ hourId: number; name: string }[]>([]);
   let [classGroups, setClassGroups] = useState<{ label: string; value: number }[]>([]);
@@ -46,6 +58,10 @@ function App() {
       setRefreshing(false);
     });
   }, []);
+
+  useEffect(() => {
+    if (scheduleQuery.isLoading) return;
+  }, [scheduleQuery]);
 
   useEffect(() => {
     if (scheduleQuery.isLoading) return;
@@ -91,16 +107,6 @@ function App() {
       );
     }
   }, [selectedClass, selectedGroups, dayId]);
-
-  let classes: { label: string; value: number }[] = [];
-  if (scheduleQuery.data != undefined) {
-    classes = scheduleQuery.data.classes.map((klasa) => {
-      return { label: klasa.name, value: klasa.id };
-    });
-
-    if (classes.length > 0 && selectedClass == null) {
-    }
-  }
 
   return (
     <View style={styles.container}>
