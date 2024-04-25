@@ -9,7 +9,7 @@ interface MultiDropdownProps {
 }
 
 const MultiDropdownComponent = (props: MultiDropdownProps) => {
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState([]);
 
   return (
     <MultiSelect
