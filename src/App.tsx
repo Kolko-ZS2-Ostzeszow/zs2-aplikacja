@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { Button, FlatList, Platform, RefreshControl, SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { Days, ScheduleData, fetchEdupageData } from "./utils/edupage";
+import { Days, fetchEdupageData } from "./utils/edupage";
 import { useEffect, useState } from "react";
 import Lesson from "./components/lesson";
 import { Accent1 } from "./theme";
@@ -8,9 +8,20 @@ import { Dropdown } from "react-native-element-dropdown";
 import DropdownComponent from "./components/dropdown";
 import MultiDropdownComponent from "./components/multi_dropdown";
 import React from "react";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 
-export default function App() {
-  let [schedule, setSchedule] = useState<ScheduleData>();
+var queryClient = new QueryClient();
+
+export default function AppWrapper() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <App></App>
+    </QueryClientProvider>
+  );
+}
+
+function App() {
+  const scheduleQuery = useQuery({ queryFn: fetchEdupageData, queryKey: ["schedule"] });
   let [selectedClass, setSelectedClass] = useState<number>(null);
   let [lessonsData, setLessonsData] = useState<{ hourId: number; name: string }[]>([]);
   let [classGroups, setClassGroups] = useState<{ label: string; value: number }[]>([]);
@@ -32,20 +43,16 @@ export default function App() {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
+    scheduleQuery.refetch().then(() => {
       setRefreshing(false);
-    }, 2000);
+    });
   }, []);
 
   useEffect(() => {
-    fetchEdupageData().then((data) => setSchedule(data));
-  });
-
-  useEffect(() => {
-    if (schedule == undefined) return;
+    if (scheduleQuery.isLoading) return;
 
     setClassGroups(
-      schedule.groups
+      scheduleQuery.data.groups
         .filter((grupa) => grupa.classId == selectedClass && !grupa.entireClass)
         .map((grupa) => {
           return { label: grupa.name, value: grupa.id };
@@ -54,11 +61,11 @@ export default function App() {
   }, [selectedClass]);
 
   useEffect(() => {
-    if (schedule != undefined && selectedClass != null) {
-      const classId = schedule.classes.find((klasa) => klasa.id == selectedClass).id;
-      const groupId = schedule.groups.find((grupa) => grupa.classId == classId && grupa.entireClass).id;
+    if (!scheduleQuery.isLoading && selectedClass != null) {
+      const classId = scheduleQuery.data.classes.find((klasa) => klasa.id == selectedClass).id;
+      const groupId = scheduleQuery.data.groups.find((grupa) => grupa.classId == classId && grupa.entireClass).id;
       setLessonsData(
-        schedule.lessons
+        scheduleQuery.data.lessons
           .filter((lesson) => {
             // return lesson.classIds.includes(classId) && lesson.dayIds.includes(1);
             return (
@@ -77,7 +84,7 @@ export default function App() {
             for (let i = 0; i < obj.duration; i++) {
               data[i] = {
                 hourId: hourId + i,
-                name: schedule.subjects.find((subject) => subject.id == obj.subjectId).name
+                name: scheduleQuery.data.subjects.find((subject) => subject.id == obj.subjectId).name
               };
             }
             return data;
@@ -89,7 +96,7 @@ export default function App() {
   // przykład wyciągania danych
   //schedule.lessons.filter((lesson) => lesson.classIds == schedule.classes.find((klasa) => klasa.name == "4TP").id);
   let classes: { label: string; value: number }[] = [];
-  if (schedule != undefined) {
+  if (scheduleQuery.data != undefined) {
     //   const classId = schedule.classes.find((klasa) => klasa.name == "2PS").id;
     //   const groupId = schedule.groups.filter((grupa) => grupa.classId == classId);
     //   const zgrupa = groupId.find((grupa) => grupa.id == 261); // grupa zawodowa
@@ -120,7 +127,7 @@ export default function App() {
     //       return names;
     //     });
 
-    classes = schedule.classes.map((klasa) => {
+    classes = scheduleQuery.data.classes.map((klasa) => {
       return { label: klasa.name, value: klasa.id };
     });
 
@@ -158,7 +165,7 @@ export default function App() {
               setDayId((dayId - 1 + 5) % 5);
             }}
           />
-          <Text style={{ fontSize: 24 }}>{schedule != undefined && Days[dayId].name}</Text>
+          <Text style={{ fontSize: 24 }}>{scheduleQuery.data != undefined && Days[dayId].name}</Text>
           <Button
             title="->"
             onPress={() => {
@@ -167,14 +174,20 @@ export default function App() {
           />
         </View>
       </View>
-      {schedule == undefined && <Text style={{ alignSelf: "center", padding: "20%", fontSize: 36 }}>Ładowanie...</Text>}
-      {schedule != undefined && (
+      {scheduleQuery.isLoading && (
+        <Text style={{ alignSelf: "center", padding: "20%", fontSize: 36 }}>Ładowanie...</Text>
+      )}
+      {scheduleQuery.data != undefined && (
         <FlatList
           data={lessonsData}
           renderItem={({ item, index }) => {
             return (
               <View style={{ marginTop: 12, marginBottom: 12 }}>
-                <Text>{schedule.hours[item.hourId].startTime + "-" + schedule.hours[item.hourId].endTime}</Text>
+                <Text>
+                  {scheduleQuery.data.hours[item.hourId].startTime +
+                    "-" +
+                    scheduleQuery.data.hours[item.hourId].endTime}
+                </Text>
                 <Lesson id={item.hourId + 1} lessonName={item.name} />
               </View>
             );

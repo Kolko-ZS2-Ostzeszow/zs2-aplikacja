@@ -12,6 +12,7 @@
     "prettify": "prettier --cache . --write"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.32.0",
     "@types/react": "~18.2.45",
     "expo": "~50.0.14",
     "expo-status-bar": "~1.11.1",
