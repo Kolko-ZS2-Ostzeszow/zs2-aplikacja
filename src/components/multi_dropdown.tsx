@@ -30,6 +30,7 @@ const MultiDropdownComponent = (props: MultiDropdownProps) => {
         setValue(item);
         props.setExternalValue(item.map((i) => parseInt(i)));
       }}
+      inside={true}
     />
   );
 };
