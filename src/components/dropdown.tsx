@@ -1,15 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
 interface DropdownProps {
   data: { label: string; value: number }[];
+  externalValue: any;
   setExternalValue: (value: number) => void;
 }
 
 const DropdownComponent = (props: DropdownProps) => {
-  const [value, setValue] = useState(null);
-
   return (
     <Dropdown
       style={styles.dropdown}
@@ -24,9 +23,8 @@ const DropdownComponent = (props: DropdownProps) => {
       valueField="value"
       placeholder="Select item"
       searchPlaceholder="Search..."
-      value={value}
+      value={props.externalValue}
       onChange={(item) => {
-        setValue(item.value);
         props.setExternalValue(item.value);
       }}
     />

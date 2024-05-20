@@ -8,6 +8,8 @@ import DropdownComponent from "./components/dropdown";
 import MultiDropdownComponent from "./components/multi_dropdown";
 import React from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Selection } from "./selection";
 
 var queryClient = new QueryClient();
 
@@ -32,6 +34,20 @@ function App() {
     },
     queryKey: ["schedule"]
   });
+
+  const selection = useQuery({
+    queryFn: async () => {
+      let data = await AsyncStorage.getItem("selection");
+
+      if (data == null) {
+        return { className: null, classGroups: [] } as Selection;
+      }
+
+      return JSON.parse(data) as Selection;
+    },
+    queryKey: ["selection"]
+  });
+
   let [classes, setClasses] = useState<{ label: string; value: number }[]>([]);
   let [selectedClass, setSelectedClass] = useState<number>(null);
   let [lessonsData, setLessonsData] = useState<{ hourId: number; name: string }[]>([]);
@@ -61,10 +77,6 @@ function App() {
 
   useEffect(() => {
     if (scheduleQuery.isLoading) return;
-  }, [scheduleQuery]);
-
-  useEffect(() => {
-    if (scheduleQuery.isLoading) return;
 
     setClassGroups(
       scheduleQuery.data.groups
@@ -73,6 +85,8 @@ function App() {
           return { label: grupa.name, value: grupa.id };
         })
     );
+
+    setSelectedGroups([]);
   }, [selectedClass]);
 
   useEffect(() => {
@@ -104,6 +118,35 @@ function App() {
     }
   }, [selectedClass, selectedGroups, dayId]);
 
+  useEffect(() => {
+    if (selection.isLoading) return;
+    if (classes == null) return;
+
+    if (selection.data.className != null) {
+      setSelectedClass(classes.find((klasa) => klasa.label == selection.data.className).value);
+    }
+
+    if (classGroups == null || classGroups.length == 0) return;
+
+    if (selection.data.classGroups.length > 0) {
+      setSelectedGroups(
+        selection.data.classGroups.map((group) => classGroups.find((grupa) => grupa.label == group).value)
+      );
+    }
+  }, [classes, classGroups]);
+
+  function setClass(value: number) {
+    setSelectedClass(value);
+    selection.data.className = classes.find((klasa) => klasa.value == value).label;
+    AsyncStorage.setItem("selection", JSON.stringify(selection.data));
+  }
+
+  function setGroup(value: number[]) {
+    setSelectedGroups(value);
+    selection.data.classGroups = value.map((group) => classGroups.find((grupa) => grupa.value == group).label);
+    AsyncStorage.setItem("selection", JSON.stringify(selection.data));
+  }
+
   return (
     <View style={styles.container}>
       <View
@@ -115,10 +158,11 @@ function App() {
           borderBottomRightRadius: 16
         }}
       >
-        <DropdownComponent data={classes} setExternalValue={setSelectedClass}></DropdownComponent>
+        <DropdownComponent data={classes} externalValue={selectedClass} setExternalValue={setClass}></DropdownComponent>
         <MultiDropdownComponent
           data={classGroups}
-          setExternalValue={setSelectedGroups}
+          setExternalValue={setGroup}
+          externalValue={selectedGroups}
           placeholder="Wybierz grupę"
         ></MultiDropdownComponent>
 

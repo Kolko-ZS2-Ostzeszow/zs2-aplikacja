@@ -1,16 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet } from "react-native";
-import { Dropdown, MultiSelect } from "react-native-element-dropdown";
+import { MultiSelect } from "react-native-element-dropdown";
 
 interface MultiDropdownProps {
   data: { label: string; value: number }[];
+  externalValue: any[];
   setExternalValue: (value: number[]) => void;
   placeholder: string;
 }
 
 const MultiDropdownComponent = (props: MultiDropdownProps) => {
-  const [value, setValue] = useState([]);
-
   return (
     <MultiSelect
       style={styles.dropdown}
@@ -25,9 +24,8 @@ const MultiDropdownComponent = (props: MultiDropdownProps) => {
       valueField="value"
       placeholder={props.placeholder}
       searchPlaceholder="Search..."
-      value={value}
+      value={props.externalValue}
       onChange={(item) => {
-        setValue(item);
         props.setExternalValue(item.map((i) => parseInt(i)));
       }}
       inside={true}
