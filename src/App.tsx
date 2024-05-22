@@ -50,7 +50,9 @@ function App() {
 
   let [classes, setClasses] = useState<{ label: string; value: number }[]>([]);
   let [selectedClass, setSelectedClass] = useState<number>(null);
-  let [lessonsData, setLessonsData] = useState<{ hourId: number; name: string }[]>([]);
+  let [lessonsData, setLessonsData] = useState<
+    { hourId: number; name: string; classroom: string | null; teacher: string }[]
+  >([]);
   let [classGroups, setClassGroups] = useState<{ label: string; value: number }[]>([]);
   let [selectedGroups, setSelectedGroups] = useState<number[]>([]);
   let [refreshing, setRefreshing] = useState<boolean>(false);
@@ -104,12 +106,14 @@ function App() {
             return a.hourId - b.hourId;
           })
           .flatMap((obj) => {
-            let data: { hourId: number; name: string }[] = [];
+            let data: { hourId: number; name: string; classroom: string | null; teacher: string }[] = [];
             const hourId = obj.hourId;
             for (let i = 0; i < obj.duration; i++) {
               data[i] = {
                 hourId: hourId + i,
-                name: scheduleQuery.data.subjects.find((subject) => subject.id == obj.subjectId).name
+                name: scheduleQuery.data.subjects.find((subject) => subject.id == obj.subjectId).name,
+                classroom: scheduleQuery.data.classrooms.find((classroom) => classroom.id == obj.classroomId).short,
+                teacher: scheduleQuery.data.teachers.find((teacher) => teacher.id == obj.teacherId).short
               };
             }
             return data;
@@ -202,7 +206,7 @@ function App() {
                     "-" +
                     scheduleQuery.data.hours[item.hourId].endTime}
                 </Text>
-                <Lesson id={item.hourId + 1} lessonName={item.name} />
+                <Lesson id={item.hourId + 1} name={item.name} classroom={item.classroom} teacher={item.teacher} />
               </View>
             );
           }}
