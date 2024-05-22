@@ -138,6 +138,7 @@ function App() {
   function setClass(value: number) {
     setSelectedClass(value);
     selection.data.className = classes.find((klasa) => klasa.value == value).label;
+    selection.data.classGroups = [];
     AsyncStorage.setItem("selection", JSON.stringify(selection.data));
   }
 
