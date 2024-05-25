@@ -8,6 +8,7 @@ export default function Layout() {
     <QueryClientProvider client={queryClient}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }}></Stack.Screen>
+        <Stack.Screen name="settings" options={{ title: "Settings" }}></Stack.Screen>
       </Stack>
     </QueryClientProvider>
   );
