@@ -1,3 +1,5 @@
+import parse from "node-html-parser";
+
 export class ScheduleData {
   hours: { startTime: number; endTime: number }[];
   buildings: { name: string; short: string }[];
@@ -202,4 +204,52 @@ export async function fetchEdupageSchedule() {
   });
 
   return parsedData;
+}
+
+export async function fetchSubstitutionData(day: Date, mode: "classes" | "teachers") {
+  let fetchedData = await (
+    await fetch("https://zs2ostrzeszow.edupage.org/substitution/server/viewer.js?__func=getSubstViewerDayDataHtml", {
+      method: "POST",
+      body: JSON.stringify({
+        __args: [
+          null,
+          {
+            date: day.toISOString().slice(0, 10),
+            mode: mode
+          }
+        ],
+        __gsh: "00000000"
+      })
+    })
+  ).json();
+
+  let htmlData = fetchedData.r;
+
+  let doc = parse(htmlData);
+
+  let data = doc
+    .querySelector("[data-date='2024-05-24']")
+    .querySelectorAll(".section, .print-nobreak")
+    .map((element) => {
+      return {
+        className: element.querySelector(".header").firstChild.innerText,
+        rows: element
+          .querySelector(".rows")
+          .querySelectorAll(".row")
+          .map((row) => {
+            let info = row.querySelector(".info").firstChild.innerText;
+
+            let hours = info.split(",")[0];
+            info = info.slice(hours.length + 2, info.length);
+
+            return {
+              period: row.querySelector(".period").firstChild.innerText,
+              hours: hours,
+              info: info
+            };
+          })
+      };
+    });
+
+  return data;
 }
