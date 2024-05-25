@@ -1,27 +1,17 @@
 import { StatusBar } from "expo-status-bar";
 import { Button, FlatList, Platform, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { Days, fetchEdupageData } from "./utils/edupage";
+import { Days, fetchEdupageData } from "../utils/edupage";
 import { useEffect, useState } from "react";
-import Lesson from "./components/lesson";
-import { Accent1 } from "./theme";
-import DropdownComponent from "./components/dropdown";
-import MultiDropdownComponent from "./components/multi_dropdown";
+import Lesson from "../components/lesson";
+import { Accent1 } from "../theme";
+import DropdownComponent from "../components/dropdown";
+import MultiDropdownComponent from "../components/multi_dropdown";
 import React from "react";
-import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Selection } from "./selection";
+import { Selection } from "../selection";
 
-var queryClient = new QueryClient();
-
-export default function AppWrapper() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <App></App>
-    </QueryClientProvider>
-  );
-}
-
-function App() {
+export default function Page() {
   const scheduleQuery = useQuery({
     queryFn: async () => {
       let data = await fetchEdupageData();
