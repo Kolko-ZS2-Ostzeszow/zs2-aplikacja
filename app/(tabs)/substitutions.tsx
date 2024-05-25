@@ -12,18 +12,21 @@ export default function Substitutions() {
   });
 
   return (
-    <View>
+    <View style={{ marginTop: 64 }}>
       <FlatList
         data={substitutionsQuery.data}
+        contentContainerStyle={{ gap: 10 }}
         renderItem={(data) => {
           return (
-            <View>
+            <View style={{}}>
               <Text>{data.item.className}</Text>
               {data.item.rows.map((row) => {
                 return (
                   <View key={row.period + row.hours + row.info}>
-                    <Text>{row.period}</Text>
-                    <Text>{row.hours}</Text>
+                    <View style={{ flexDirection: "row", gap: 10 }}>
+                      <Text>{row.period}</Text>
+                      <Text>{row.hours}</Text>
+                    </View>
                     <Text>{row.info}</Text>
                   </View>
                 );
