@@ -117,7 +117,7 @@ export default function Schedule() {
     if (classes == null) return;
 
     if (selection.data.className != null) {
-      setSelectedClass(classes.find((klasa) => klasa.label == selection.data.className).value);
+      setSelectedClass(classes.find((klasa) => klasa.label == selection.data.className)?.value);
     }
 
     if (classGroups == null || classGroups.length == 0) return;
