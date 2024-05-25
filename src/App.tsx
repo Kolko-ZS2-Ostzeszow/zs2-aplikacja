@@ -66,7 +66,7 @@ function App() {
     if (day >= 1 && day <= 5) {
       return day - 1;
     } else {
-      return 1;
+      return 0;
     }
   }
 
