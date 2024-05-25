@@ -21,7 +21,7 @@ export default function Substitutions() {
               <Text>{data.item.className}</Text>
               {data.item.rows.map((row) => {
                 return (
-                  <View>
+                  <View key={row.period + row.hours + row.info}>
                     <Text>{row.period}</Text>
                     <Text>{row.hours}</Text>
                     <Text>{row.info}</Text>
