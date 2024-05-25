@@ -27,7 +27,7 @@ export const Days = [
   { short: "Pi", name: "Piątek" }
 ];
 
-export async function fetchEdupageData() {
+export async function fetchEdupageSchedule() {
   let timetableId = (
     await (
       await fetch("https://zs2ostrzeszow.edupage.org/timetable/server/ttviewer.js?__func=getTTViewerData", {

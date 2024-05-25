@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { Button, FlatList, Platform, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { Days, fetchEdupageData } from "../utils/edupage";
+import { Days, fetchEdupageSchedule } from "../utils/edupage";
 import { useEffect, useState } from "react";
 import Lesson from "../components/lesson";
 import { Accent1 } from "../theme";
@@ -14,7 +14,7 @@ import { Selection } from "../selection";
 export default function Schedule() {
   const scheduleQuery = useQuery({
     queryFn: async () => {
-      let data = await fetchEdupageData();
+      let data = await fetchEdupageSchedule();
       setClasses(
         data.classes.map((klasa) => {
           return { label: klasa.name, value: klasa.id };
