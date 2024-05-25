@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Selection } from "../selection";
 
-export default function Page() {
+export default function Schedule() {
   const scheduleQuery = useQuery({
     queryFn: async () => {
       let data = await fetchEdupageData();
