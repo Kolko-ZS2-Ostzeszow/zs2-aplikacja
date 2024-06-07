@@ -1,9 +1,18 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs, useRouter } from "expo-router";
+import { useCallback } from "react";
 import { Pressable } from "react-native";
+import { throttle } from "../utils/throttle";
 
 export default function TabLayout() {
   const router = useRouter();
+
+  const settingsPressed = useCallback(
+    throttle(() => {
+      router.push("settings");
+    }, 100),
+    []
+  );
 
   return (
     <Tabs
@@ -32,7 +41,7 @@ export default function TabLayout() {
           tabBarButton: (props) => (
             <Pressable
               onPress={() => {
-                router.push("settings");
+                settingsPressed();
               }}
               style={{
                 justifyContent: "center",
