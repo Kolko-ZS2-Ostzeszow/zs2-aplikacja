@@ -206,6 +206,17 @@ export async function fetchEdupageSchedule() {
   return parsedData;
 }
 
+type Diff = {
+  original: string;
+  replacement: string | undefined;
+};
+
+type ChangeDiff = {
+  subject: Diff | undefined;
+  teacher: Diff | undefined;
+  classroom: Diff | undefined;
+};
+
 export async function fetchSubstitutionData(day: Date, mode: "classes" | "teachers") {
   let fetchedData = await (
     await fetch("https://zs2ostrzeszow.edupage.org/substitution/server/viewer.js?__func=getSubstViewerDayDataHtml", {
@@ -228,26 +239,135 @@ export async function fetchSubstitutionData(day: Date, mode: "classes" | "teache
   let doc = parse(htmlData);
 
   let data = doc
-    .querySelector("[data-date='2024-05-24']")
+    .querySelector("[data-date]")
     .querySelectorAll(".section, .print-nobreak")
     .map((element) => {
+      const isAbsent = element.querySelector(".absent") != null;
+
       return {
         className: element.querySelector(".header").firstChild.innerText,
-        rows: element
-          .querySelector(".rows")
-          .querySelectorAll(".row")
-          .map((row) => {
-            let info = row.querySelector(".info").firstChild.innerText;
+        isAbsent: isAbsent,
+        rows: !isAbsent
+          ? element
+              .querySelector(".rows")
+              .querySelectorAll(".row")
+              .map((row) => {
+                const type: "change" | "cancel" = row.classList.contains("change") ? "change" : "cancel";
 
-            let hours = info.split(",")[0];
-            info = info.slice(hours.length + 2, info.length);
+                let info = row.querySelector(".info").firstChild.innerText;
+                const classroomChanged = info.includes(" Zmień salę lekcyjną: ");
+                const subjectChanged = info.includes(" Zastępstwa: ");
 
-            return {
-              period: row.querySelector(".period").firstChild.innerText,
-              hours: hours,
-              info: info
-            };
-          })
+                if (type === "cancel") {
+                  info = info.replace(", Anulowano", "");
+                }
+
+                if (type === "change") {
+                  if (info.includes(" Zastępstwa: ")) info = info.split(" Zastępstwa: ").join(" ");
+
+                  if (info.includes(" Zmień salę lekcyjną: ")) info = info.split(" Zmień salę lekcyjną: ").join(" ");
+
+                  if (info.includes("Nauczyciel: ")) info = info.split("Nauczyciel: ").join(" ");
+                }
+
+                let hours = info.split(",")[0];
+                info = info.slice(hours.length + 2, info.length);
+
+                let groups = info.includes(": ") ? info.split(":")[0].split(", ") : [];
+
+                if (groups.length > 0) {
+                  info = info.slice(groups.join(", ").length + 2, info.length);
+                }
+
+                let diff: ChangeDiff = { subject: undefined, teacher: undefined, classroom: undefined };
+
+                if (type === "change") {
+                  if (classroomChanged) {
+                    let classroomChange = info.split(", ")[1];
+                    info = info.substring(0, info.length - classroomChange.length - 2);
+
+                    let classrooms = classroomChange.split(" ➔ ");
+
+                    diff.classroom = {
+                      original: classrooms[0].replace("(", "").replace(")", ""),
+                      replacement: classrooms[1]
+                    };
+                  }
+
+                  if (subjectChanged) {
+                    let changes = info.split(", ")[0];
+                    let additionalInfo = info.split(", ")[1];
+
+                    if (additionalInfo !== undefined) {
+                      info = additionalInfo;
+                    } else {
+                      info = "";
+                    }
+
+                    let subjects = changes.split(" - ")[0].split(" ➔ ");
+                    changes = changes.slice(subjects.join(" ➔ ").length + 2, changes.length);
+
+                    diff.subject = {
+                      original: subjects[0].replace("(", "").replace(")", ""),
+                      replacement: subjects[1]
+                    };
+
+                    let teachers = changes.split(" ➔ ");
+                    diff.teacher = {
+                      original: teachers[0].replace("(", "").replace(")", ""),
+                      replacement: teachers[1]
+                    };
+                  } else {
+                    let changes = info.split(", ")[0];
+                    let additionalInfo = info.split(", ")[1];
+                    if (additionalInfo !== undefined) {
+                      info = additionalInfo;
+                    } else {
+                      info = "";
+                    }
+
+                    let subject = changes.split(" - ")[0];
+                    let teacher = changes.split(" - ")[1];
+
+                    diff.subject = {
+                      original: subject,
+                      replacement: undefined
+                    };
+
+                    diff.teacher = {
+                      original: teacher.trim(),
+                      replacement: undefined
+                    };
+                  }
+                }
+
+                if (type === "cancel") {
+                  let subjectChange = info.split("-")[0];
+                  info = info.slice(subjectChange.length + 2, info.length);
+
+                  diff.subject = {
+                    original: subjectChange.split(")")[0].slice(1),
+                    replacement: undefined
+                  };
+
+                  diff.teacher = {
+                    original: info,
+                    replacement: undefined
+                  };
+
+                  info = "";
+                }
+
+                return {
+                  type: type,
+                  groups: groups,
+                  diff: diff,
+                  period: row.querySelector(".period").firstChild.innerText.replace("(", "").replace(")", ""),
+                  hours: hours,
+                  info: info
+                };
+              })
+          : undefined
       };
     });
 
