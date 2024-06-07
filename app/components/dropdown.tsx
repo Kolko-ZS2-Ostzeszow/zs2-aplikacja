@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TextInput } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
 interface DropdownProps {
@@ -27,6 +27,15 @@ const DropdownComponent = (props: DropdownProps) => {
       onChange={(item) => {
         props.setExternalValue(item.value);
       }}
+      renderInputSearch={(onSearch) => (
+        <TextInput
+          style={styles.inputSearchStyle}
+          onChangeText={(text) => {
+            onSearch(text);
+          }}
+          placeholder="Search..."
+        ></TextInput>
+      )}
     />
   );
 };
@@ -56,6 +65,10 @@ const styles = StyleSheet.create({
   },
   inputSearchStyle: {
     height: 40,
-    fontSize: 16
+    fontSize: 16,
+    borderColor: "lightgray",
+    borderWidth: 0.5,
+    margin: 8,
+    padding: 8
   }
 });
