@@ -7,12 +7,9 @@ import { throttle } from "../utils/throttle";
 export default function TabLayout() {
   const router = useRouter();
 
-  const settingsPressed = useCallback(
-    throttle(() => {
-      router.push("settings");
-    }, 100),
-    []
-  );
+  const settingsPressed = throttle(() => {
+    router.push("settings");
+  }, 100);
 
   return (
     <Tabs
