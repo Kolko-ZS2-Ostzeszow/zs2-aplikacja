@@ -9,12 +9,14 @@
     "web": "expo start --web",
     "ts:check": "tsc",
     "prepare": "husky",
-    "prettify": "prettier --cache . --write"
+    "prettify": "prettier --cache . --write",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",
     "@tanstack/react-query": "^5.40.1",
     "@types/react": "~18.2.79",
+    "eslint-plugin-react-compiler": "^0.0.0-experimental-51a85ea-20240601",
     "expo": "~51.0.11",
     "expo-router": "~3.5.15",
     "expo-status-bar": "~1.12.1",
@@ -26,6 +28,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",
+    "eslint": "^8.57.0",
+    "eslint-config-expo": "^7.0.0",
     "husky": "^9.0.11",
     "prettier": "^3.3.1"
   },
