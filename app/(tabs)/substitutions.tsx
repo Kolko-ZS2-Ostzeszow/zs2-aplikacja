@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchSubstitutionData } from "../utils/edupage";
 import { FlatList, Text, View } from "react-native";
+import { MaterialIcons, AntDesign } from "@expo/vector-icons";
+import { Accent1 } from "../theme";
 
 export default function Substitutions() {
   const substitutionsQuery = useQuery({
@@ -25,39 +27,84 @@ export default function Substitutions() {
         renderItem={(data) => {
           return (
             <View>
-              <Text>{data.item.className}</Text>
-              {data.item.isAbsent && <Text>Nieobecność</Text>}
+              <Text style={{ textAlign: "center", fontWeight: "700", fontSize: 24, marginBottom: 8 }}>
+                {data.item.className}
+              </Text>
+              {data.item.isAbsent && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 8,
+                    backgroundColor: "lightgray",
+                    borderRadius: 8,
+                    marginHorizontal: 8,
+                    padding: 8
+                  }}
+                >
+                  <MaterialIcons name="do-not-disturb" size={24} color="red" />
+                  <Text>Nieobecność</Text>
+                </View>
+              )}
               {!data.item.isAbsent &&
                 data.item.rows.map((row) => (
-                  <View key={JSON.stringify(row)} style={{ marginBottom: 8 }}>
-                    <View style={{ flexDirection: "row", gap: 16 }}>
-                      <Text>{row.period}</Text>
-                      <Text>{row.groups.join(", ")}</Text>
+                  <View
+                    key={JSON.stringify(row)}
+                    style={{
+                      marginBottom: 8,
+                      backgroundColor: Accent1,
+                      padding: 8,
+                      marginHorizontal: 8,
+                      borderRadius: 8
+                    }}
+                  >
+                    <View style={{ flexDirection: "row", gap: 16, justifyContent: "space-between" }}>
+                      <Text style={{ color: "white", fontWeight: "600" }}>{row.period}</Text>
+                      <Text style={{ color: "white", fontWeight: "600" }}>{row.groups.join(", ")}</Text>
                     </View>
-                    <View style={{ flexDirection: "row", gap: 16 }}>
-                      {row.type === "cancel" && <Text>Anulowano {row.info}</Text>}
-                      {row.type === "change" && (
-                        <View>
-                          <Text>Zmiana {row.info}</Text>
-                          <View>
-                            {row.diff.classroom && (
-                              <Text>{row.diff.classroom.original + " -> " + row.diff.classroom.replacement}</Text>
-                            )}
-                            {row.diff.teacher && (
-                              <Text>
-                                {row.diff.teacher.original +
-                                  (row.diff.teacher.replacement ? " -> " + row.diff.teacher.replacement : "")}
-                              </Text>
-                            )}
-                            {row.diff.subject && (
-                              <Text>
-                                {row.diff.subject.original +
-                                  (row.diff.subject.replacement ? " -> " + row.diff.subject.replacement : "")}
-                              </Text>
-                            )}
-                          </View>
+                    <View>
+                      {row.type === "cancel" && (
+                        <View style={{ flexDirection: "row", justifyContent: "center", gap: 16 }}>
+                          <Text style={{ color: "white" }}>{row.diff.subject.original}</Text>
+                          <AntDesign name="arrowright" size={24} color="white" />
+                          <Text style={{ color: "white", textAlign: "right" }}>Anulowano</Text>
                         </View>
                       )}
+                      {row.type === "change" && (
+                        <View>
+                          {row.diff.subject && (
+                            <View style={{ flexDirection: "row", justifyContent: "center", gap: 16 }}>
+                              <Text style={{ color: "white" }}>{row.diff.subject.original}</Text>
+                              {row.diff.subject.replacement && <AntDesign name="arrowright" size={24} color="white" />}
+                              {row.diff.subject.replacement && (
+                                <Text style={{ color: "white" }}>{row.diff.subject.replacement}</Text>
+                              )}
+                            </View>
+                          )}
+                          {row.diff.teacher && row.diff.teacher.replacement && (
+                            <View style={{ flexDirection: "row", justifyContent: "center", gap: 16 }}>
+                              <Text style={{ color: "white" }}>{row.diff.teacher.original}</Text>
+                              {row.diff.teacher.replacement && <AntDesign name="arrowright" size={24} color="white" />}
+                              {row.diff.teacher.replacement && (
+                                <Text style={{ color: "white" }}>{row.diff.teacher.replacement}</Text>
+                              )}
+                            </View>
+                          )}
+                          {row.diff.classroom && row.diff.classroom.replacement && (
+                            <View style={{ flexDirection: "row", justifyContent: "center", gap: 16 }}>
+                              <Text style={{ color: "white" }}>{row.diff.classroom.original}</Text>
+                              {row.diff.classroom.replacement && (
+                                <AntDesign name="arrowright" size={24} color="white" />
+                              )}
+                              {row.diff.classroom.replacement && (
+                                <Text style={{ color: "white" }}>{row.diff.classroom.replacement}</Text>
+                              )}
+                            </View>
+                          )}
+                        </View>
+                      )}
+                      {row.info !== "" && <Text style={{ color: "white" }}>Informacja: {row.info}</Text>}
                     </View>
                   </View>
                 ))}
