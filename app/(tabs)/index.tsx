@@ -176,7 +176,7 @@ export default function Schedule() {
               setDayId((dayId - 1 + 5) % 5);
             }}
           />
-          <Text style={{ fontSize: 24 }}>{scheduleQuery.data != undefined && Days[dayId].name}</Text>
+          <Text style={{ fontSize: 24, color: "white" }}>{scheduleQuery.data != undefined && Days[dayId].name}</Text>
           <Button
             title="->"
             onPress={() => {
