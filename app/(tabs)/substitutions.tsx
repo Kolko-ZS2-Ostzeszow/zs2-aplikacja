@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchSubstitutionData } from "../utils/edupage";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text, View, useColorScheme } from "react-native";
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import { Accent1 } from "../theme";
+import { getBackgroundColor, getTextColor } from "../utils/color";
 
 export default function Substitutions() {
   const substitutionsQuery = useQuery({
@@ -13,12 +14,14 @@ export default function Substitutions() {
     queryKey: ["substitutions"]
   });
 
+  const scheme = useColorScheme();
+
   return (
-    <View style={{ marginTop: 64 }}>
-      {substitutionsQuery.isLoading && <Text>Ładowanie...</Text>}
+    <View style={{ marginTop: 64, backgroundColor: getBackgroundColor(scheme) }}>
+      {substitutionsQuery.isLoading && <Text style={{ color: getTextColor(scheme) }}>Ładowanie...</Text>}
       {substitutionsQuery.isError && (
         <View>
-          <Text>{substitutionsQuery.error.message}</Text>
+          <Text style={{ color: getTextColor(scheme) }}>{substitutionsQuery.error.message}</Text>
         </View>
       )}
       <FlatList
@@ -27,7 +30,15 @@ export default function Substitutions() {
         renderItem={(data) => {
           return (
             <View>
-              <Text style={{ textAlign: "center", fontWeight: "700", fontSize: 24, marginBottom: 8 }}>
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontWeight: "700",
+                  fontSize: 24,
+                  marginBottom: 8,
+                  color: getTextColor(scheme)
+                }}
+              >
                 {data.item.className}
               </Text>
               {data.item.isAbsent && (

@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { Button, FlatList, Platform, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Button, FlatList, Platform, RefreshControl, Text, View, useColorScheme } from "react-native";
 import { Days, fetchEdupageSchedule } from "../utils/edupage";
 import { useEffect, useState } from "react";
 import Lesson from "../components/lesson";
@@ -10,8 +10,11 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Selection } from "../selection";
+import { getTextColor } from "../utils/color";
 
 export default function Schedule() {
+  const scheme = useColorScheme();
+
   const scheduleQuery = useQuery({
     queryFn: async () => {
       let data = await fetchEdupageSchedule();
@@ -143,7 +146,7 @@ export default function Schedule() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
       <View
         style={{
           paddingTop: Platform.OS === "android" ? 25 : 0,
@@ -183,7 +186,9 @@ export default function Schedule() {
         </View>
       </View>
       {scheduleQuery.isLoading && (
-        <Text style={{ alignSelf: "center", padding: "20%", fontSize: 36 }}>Ładowanie...</Text>
+        <Text style={{ alignSelf: "center", padding: "20%", fontSize: 36, color: getTextColor(scheme) }}>
+          Ładowanie...
+        </Text>
       )}
       {scheduleQuery.data != undefined && (
         <FlatList
@@ -191,7 +196,7 @@ export default function Schedule() {
           renderItem={({ item, index }) => {
             return (
               <View style={{ marginTop: 12, marginBottom: 12 }}>
-                <Text>
+                <Text style={{ color: scheme === "light" ? "black" : "white" }}>
                   {scheduleQuery.data.hours[item.hourId].startTime +
                     "-" +
                     scheduleQuery.data.hours[item.hourId].endTime}
@@ -208,10 +213,3 @@ export default function Schedule() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff"
-  }
-});

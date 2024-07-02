@@ -1,11 +1,13 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs, useRouter } from "expo-router";
-import { useCallback } from "react";
-import { Pressable } from "react-native";
+import { Pressable, useColorScheme } from "react-native";
 import { throttle } from "../utils/throttle";
+import { getBackgroundColor } from "../utils/color";
+import { Accent1 } from "../theme";
 
 export default function TabLayout() {
   const router = useRouter();
+  const scheme = useColorScheme();
 
   const settingsPressed = throttle(() => {
     router.push("settings");
@@ -14,8 +16,18 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "blue",
-        headerShown: false
+        tabBarActiveTintColor: "white",
+        tabBarInactiveTintColor: "#a3a3a3",
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: Accent1,
+          borderColor: "black",
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16
+        }
+      }}
+      sceneContainerStyle={{
+        backgroundColor: getBackgroundColor(scheme)
       }}
     >
       <Tabs.Screen
@@ -45,7 +57,7 @@ export default function TabLayout() {
                 paddingHorizontal: 24
               }}
             >
-              <FontAwesome size={24} name="cog" color="gray" />
+              <FontAwesome size={24} name="cog" color="#a3a3a3" />
             </Pressable>
           )
         }}
