@@ -346,7 +346,7 @@ export async function fetchSubstitutionData(day: Date, mode: "classes" | "teache
                   info = info.slice(subjectChange.length + 2, info.length);
 
                   diff.subject = {
-                    original: subjectChange.split(")")[0].slice(1),
+                    original: subjectChange.split(")")[0].trim(),
                     replacement: undefined
                   };
 
