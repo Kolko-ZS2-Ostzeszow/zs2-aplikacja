@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { Button, FlatList, LayoutAnimation, Pressable, RefreshControl, Text, View, useColorScheme } from "react-native";
 import { Days, fetchEdupageSchedule } from "../utils/edupage";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Lesson from "../components/lesson";
 import { Accent1 } from "../theme";
 import DropdownComponent from "../components/dropdown";
@@ -19,16 +19,13 @@ export default function Schedule() {
   const insets = useSafeAreaInsets();
   let [topBarHeightSet, setTopBarHeightSet] = useState(false);
   let [topBarHeight, setTopBarHeight] = useState<number>();
+  let [refreshing, setRefreshing] = useState<boolean>(false);
+  let [dayId, setDayId] = useState<number>(getBestDayId());
+  const [filterExpanded, setFilterExpanded] = useState<boolean>(false);
 
   const scheduleQuery = useQuery({
     queryFn: async () => {
-      let data = await fetchEdupageSchedule();
-      setClasses(
-        data.classes.map((klasa) => {
-          return { label: klasa.name, value: klasa.id };
-        })
-      );
-      return data;
+      return await fetchEdupageSchedule();
     },
     queryKey: ["schedule"]
   });
@@ -37,25 +34,74 @@ export default function Schedule() {
     queryFn: async () => {
       let data = await AsyncStorage.getItem("selection");
 
-      if (data == null) {
-        return { className: null, classGroups: [] } as Selection;
-      }
+      if (data == null) return null;
 
       return JSON.parse(data) as Selection;
     },
     queryKey: ["selection"]
   });
 
-  let [classes, setClasses] = useState<{ label: string; value: number }[]>([]);
-  let [selectedClass, setSelectedClass] = useState<number>(null);
-  let [lessonsData, setLessonsData] = useState<
-    { hourId: number; name: string; classroom: string | null; teacher: string }[]
-  >([]);
-  let [classGroups, setClassGroups] = useState<{ label: string; value: number }[]>([]);
-  let [selectedGroups, setSelectedGroups] = useState<number[]>([]);
-  let [refreshing, setRefreshing] = useState<boolean>(false);
-  let [dayId, setDayId] = useState<number>(getBestDayId());
-  const [filterExpanded, setFilterExpanded] = useState<boolean>(false);
+  const classes = useMemo(() => {
+    if (scheduleQuery.data == null) return [];
+
+    return scheduleQuery.data.classes.map((classValue) => {
+      return { label: classValue.name, value: classValue.id };
+    });
+  }, [scheduleQuery.data]);
+  const [selectedClass, setSelectedClass] = useState<number>(null);
+
+  const classGroups = useMemo(() => {
+    if (scheduleQuery.data == null || selectedClass == null) return [];
+
+    return scheduleQuery.data.groups
+      .filter((grupa) => grupa.classId === selectedClass && !grupa.entireClass)
+      .map((grupa) => {
+        return { label: grupa.name, value: grupa.id };
+      });
+  }, [scheduleQuery.data, selectedClass]);
+  const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
+
+  const lessons = useMemo(() => {
+    if (scheduleQuery.data == null || selectedClass == null) return [];
+
+    const groupId = scheduleQuery.data.groups.find((grupa) => grupa.classId === selectedClass && grupa.entireClass).id;
+
+    return scheduleQuery.data.lessons
+      .filter((lesson) => {
+        return lesson.groupIds.some((id) => [...selectedGroups, groupId].includes(id)) && lesson.dayId === dayId;
+      })
+      .sort((a, b) => {
+        return a.hourId - b.hourId;
+      })
+      .flatMap((obj) => {
+        let data: { hourId: number; name: string; classroom: string | null; teacher: string }[] = [];
+        const hourId = obj.hourId;
+        for (let i = 0; i < obj.duration; i++) {
+          data[i] = {
+            hourId: hourId + i,
+            name: scheduleQuery.data.subjects.find((subject) => subject.id === obj.subjectId).name,
+            classroom: scheduleQuery.data.classrooms.find((classroom) => classroom.id === obj.classroomId).short,
+            teacher: scheduleQuery.data.teachers.find((teacher) => teacher.id === obj.teacherId).short
+          };
+        }
+        return data;
+      });
+  }, [scheduleQuery.data, selectedClass, selectedGroups, dayId]);
+
+  useEffect(() => {
+    if (scheduleQuery.data == null || selection.data == null) return;
+
+    setSelectedClass(classes.find((value) => value.label === selection.data.className).value);
+  }, [scheduleQuery.data, selection.data, classes]);
+
+  useEffect(() => {
+    if (scheduleQuery.data == null || selection.data == null || selectedClass == null || classGroups.length === 0)
+      return;
+
+    setSelectedGroups(
+      classGroups.filter((value) => selection.data.classGroups.includes(value.label)).map((value) => value.value)
+    );
+  }, [scheduleQuery.data, selection.data, selectedClass, classGroups]);
 
   function getBestDayId(): number {
     const date = new Date();
@@ -76,79 +122,22 @@ export default function Schedule() {
     });
   }, []);
 
-  useEffect(() => {
-    if (scheduleQuery.isLoading) return;
-
-    setClassGroups(
-      scheduleQuery.data.groups
-        .filter((grupa) => grupa.classId == selectedClass && !grupa.entireClass)
-        .map((grupa) => {
-          return { label: grupa.name, value: grupa.id };
-        })
-    );
-
-    setSelectedGroups([]);
-  }, [selectedClass]);
-
-  useEffect(() => {
-    if (!scheduleQuery.isLoading && selectedClass != null) {
-      const classId = scheduleQuery.data.classes.find((klasa) => klasa.id == selectedClass).id;
-
-      const groupId = scheduleQuery.data.groups.find((grupa) => grupa.classId == classId && grupa.entireClass).id;
-      setLessonsData(
-        scheduleQuery.data.lessons
-          .filter((lesson) => {
-            // return lesson.classIds.includes(classId) && lesson.dayIds.includes(1);
-            return lesson.groupIds.some((id) => [...selectedGroups, groupId].includes(id)) && lesson.dayId === dayId;
-          })
-          .sort((a, b) => {
-            return a.hourId - b.hourId;
-          })
-          .flatMap((obj) => {
-            let data: { hourId: number; name: string; classroom: string | null; teacher: string }[] = [];
-            const hourId = obj.hourId;
-            for (let i = 0; i < obj.duration; i++) {
-              data[i] = {
-                hourId: hourId + i,
-                name: scheduleQuery.data.subjects.find((subject) => subject.id == obj.subjectId).name,
-                classroom: scheduleQuery.data.classrooms.find((classroom) => classroom.id == obj.classroomId).short,
-                teacher: scheduleQuery.data.teachers.find((teacher) => teacher.id == obj.teacherId).short
-              };
-            }
-            return data;
-          })
-      );
-    }
-  }, [selectedClass, selectedGroups, dayId]);
-
-  useEffect(() => {
-    if (selection.isLoading) return;
-    if (classes == null) return;
-
-    if (selection.data.className != null) {
-      setSelectedClass(classes.find((klasa) => klasa.label == selection.data.className)?.value);
-    }
-
-    if (classGroups == null || classGroups.length == 0) return;
-
-    if (selection.data.classGroups.length > 0) {
-      setSelectedGroups(
-        selection.data.classGroups.map((group) => classGroups.find((grupa) => grupa.label == group).value)
-      );
-    }
-  }, [classes, classGroups]);
-
   function setClass(value: number) {
     setSelectedClass(value);
-    selection.data.className = classes.find((klasa) => klasa.value == value).label;
-    selection.data.classGroups = [];
-    AsyncStorage.setItem("selection", JSON.stringify(selection.data));
+    let newSelection = {
+      className: classes.find((klasa) => klasa.value === value).label,
+      classGroups: []
+    };
+    AsyncStorage.setItem("selection", JSON.stringify(newSelection));
   }
 
-  function setGroup(value: number[]) {
+  function setGroups(value: number[]) {
     setSelectedGroups(value);
-    selection.data.classGroups = value.map((group) => classGroups.find((grupa) => grupa.value == group).label);
-    AsyncStorage.setItem("selection", JSON.stringify(selection.data));
+    let newSelection = {
+      className: selection.data.className,
+      classGroups: classGroups.filter((group) => value.includes(group.value)).map((group) => group.label)
+    };
+    AsyncStorage.setItem("selection", JSON.stringify(newSelection));
   }
 
   return (
@@ -181,7 +170,7 @@ export default function Schedule() {
             ></DropdownComponent>
             <MultiDropdownComponent
               data={classGroups}
-              setExternalValue={setGroup}
+              setExternalValue={setGroups}
               externalValue={selectedGroups}
               placeholder="Wybierz grupę"
             ></MultiDropdownComponent>
@@ -229,7 +218,7 @@ export default function Schedule() {
       )}
       {scheduleQuery.data != undefined && (
         <FlatList
-          data={lessonsData}
+          data={lessons}
           renderItem={({ item, index }) => {
             return (
               <View style={{ marginTop: 12, marginBottom: 12 }}>
