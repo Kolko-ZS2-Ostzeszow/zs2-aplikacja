@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchSubstitutionData } from "../utils/edupage";
 import { FlatList, Text, View, useColorScheme } from "react-native";
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
-import { Accent1 } from "../theme";
+import { Accent1, DarkFg } from "../theme";
 import { getBackgroundColor, getTextColor } from "../utils/color";
 
 export default function Substitutions() {
@@ -48,14 +48,14 @@ export default function Substitutions() {
                     justifyContent: "center",
                     alignItems: "center",
                     gap: 8,
-                    backgroundColor: "lightgray",
+                    backgroundColor: scheme === "light" ? "lightgray" : DarkFg,
                     borderRadius: 8,
                     marginHorizontal: 8,
                     padding: 8
                   }}
                 >
                   <MaterialIcons name="do-not-disturb" size={24} color="red" />
-                  <Text>Nieobecność</Text>
+                  <Text style={{ color: getTextColor(scheme) }}>Nieobecność</Text>
                 </View>
               )}
               {!data.item.isAbsent &&
