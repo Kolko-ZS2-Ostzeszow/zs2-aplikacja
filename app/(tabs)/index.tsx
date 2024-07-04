@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { Button, FlatList, Pressable, RefreshControl, Text, View, useColorScheme } from "react-native";
+import { Button, FlatList, LayoutAnimation, Pressable, RefreshControl, Text, View, useColorScheme } from "react-native";
 import { Days, fetchEdupageSchedule } from "../utils/edupage";
 import { useEffect, useState } from "react";
 import Lesson from "../components/lesson";
@@ -17,6 +17,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 export default function Schedule() {
   const scheme = useColorScheme();
   const insets = useSafeAreaInsets();
+  let [topBarHeightSet, setTopBarHeightSet] = useState(false);
+  let [topBarHeight, setTopBarHeight] = useState<number>();
 
   const scheduleQuery = useQuery({
     queryFn: async () => {
@@ -150,30 +152,41 @@ export default function Schedule() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, paddingTop: topBarHeight }}>
       <View
+        onLayout={(event) => {
+          if (!topBarHeightSet) {
+            setTopBarHeight(event.nativeEvent.layout.height);
+            setTopBarHeightSet(true);
+          }
+        }}
         style={{
           paddingTop: insets.top + 12,
           paddingBottom: 24,
           backgroundColor: Accent1,
           height: "auto",
           borderBottomLeftRadius: 16,
-          borderBottomRightRadius: 16
+          borderBottomRightRadius: 16,
+          position: "absolute",
+          width: "100%",
+          zIndex: 1
         }}
       >
-        <View style={{ display: filterExpanded ? "flex" : "none" }}>
-          <DropdownComponent
-            data={classes}
-            externalValue={selectedClass}
-            setExternalValue={setClass}
-          ></DropdownComponent>
-          <MultiDropdownComponent
-            data={classGroups}
-            setExternalValue={setGroup}
-            externalValue={selectedGroups}
-            placeholder="Wybierz grupę"
-          ></MultiDropdownComponent>
-        </View>
+        {filterExpanded && (
+          <View>
+            <DropdownComponent
+              data={classes}
+              externalValue={selectedClass}
+              setExternalValue={setClass}
+            ></DropdownComponent>
+            <MultiDropdownComponent
+              data={classGroups}
+              setExternalValue={setGroup}
+              externalValue={selectedGroups}
+              placeholder="Wybierz grupę"
+            ></MultiDropdownComponent>
+          </View>
+        )}
         <View style={{ flexDirection: "row", gap: 16 }}>
           <View
             style={{
@@ -201,6 +214,7 @@ export default function Schedule() {
           <Pressable
             style={{ padding: 8, justifyContent: "center" }}
             onPress={() => {
+              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
               setFilterExpanded(!filterExpanded);
             }}
           >

@@ -1,10 +1,14 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
-import { useColorScheme } from "react-native";
+import { Platform, UIManager, useColorScheme } from "react-native";
 import { getBackgroundColor } from "./utils/color";
 import { Accent1 } from "./theme";
 
 var queryClient = new QueryClient();
+
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 export default function Layout() {
   const scheme = useColorScheme();
