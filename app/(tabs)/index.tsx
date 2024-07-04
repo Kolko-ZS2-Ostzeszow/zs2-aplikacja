@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { Button, FlatList, Platform, RefreshControl, Text, View, useColorScheme } from "react-native";
+import { Button, FlatList, Pressable, RefreshControl, Text, View, useColorScheme } from "react-native";
 import { Days, fetchEdupageSchedule } from "../utils/edupage";
 import { useEffect, useState } from "react";
 import Lesson from "../components/lesson";
@@ -11,9 +11,12 @@ import { useQuery } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Selection } from "../selection";
 import { getTextColor } from "../utils/color";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function Schedule() {
   const scheme = useColorScheme();
+  const insets = useSafeAreaInsets();
 
   const scheduleQuery = useQuery({
     queryFn: async () => {
@@ -50,6 +53,7 @@ export default function Schedule() {
   let [selectedGroups, setSelectedGroups] = useState<number[]>([]);
   let [refreshing, setRefreshing] = useState<boolean>(false);
   let [dayId, setDayId] = useState<number>(getBestDayId());
+  const [filterExpanded, setFilterExpanded] = useState<boolean>(false);
 
   function getBestDayId(): number {
     const date = new Date();
@@ -149,40 +153,59 @@ export default function Schedule() {
     <View style={{ flex: 1 }}>
       <View
         style={{
-          paddingTop: Platform.OS === "android" ? 25 : 0,
+          paddingTop: insets.top + 12,
+          paddingBottom: 24,
           backgroundColor: Accent1,
-          height: "30%",
+          height: "auto",
           borderBottomLeftRadius: 16,
           borderBottomRightRadius: 16
         }}
       >
-        <DropdownComponent data={classes} externalValue={selectedClass} setExternalValue={setClass}></DropdownComponent>
-        <MultiDropdownComponent
-          data={classGroups}
-          setExternalValue={setGroup}
-          externalValue={selectedGroups}
-          placeholder="Wybierz grupę"
-        ></MultiDropdownComponent>
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between"
-          }}
-        >
-          <Button
-            title="<-"
-            onPress={() => {
-              setDayId((dayId - 1 + 5) % 5);
+        <View style={{ display: filterExpanded ? "flex" : "none" }}>
+          <DropdownComponent
+            data={classes}
+            externalValue={selectedClass}
+            setExternalValue={setClass}
+          ></DropdownComponent>
+          <MultiDropdownComponent
+            data={classGroups}
+            setExternalValue={setGroup}
+            externalValue={selectedGroups}
+            placeholder="Wybierz grupę"
+          ></MultiDropdownComponent>
+        </View>
+        <View style={{ flexDirection: "row", gap: 16 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flex: 2,
+              paddingHorizontal: 8
             }}
-          />
-          <Text style={{ fontSize: 24, color: "white" }}>{scheduleQuery.data != undefined && Days[dayId].name}</Text>
-          <Button
-            title="->"
+          >
+            <Button
+              title="<-"
+              onPress={() => {
+                setDayId((dayId - 1 + 5) % 5);
+              }}
+            />
+            <Text style={{ fontSize: 24, color: "white" }}>{scheduleQuery.data != undefined && Days[dayId].name}</Text>
+            <Button
+              title="->"
+              onPress={() => {
+                setDayId((dayId + 1) % 5);
+              }}
+            />
+          </View>
+          <Pressable
+            style={{ padding: 8, justifyContent: "center" }}
             onPress={() => {
-              setDayId((dayId + 1) % 5);
+              setFilterExpanded(!filterExpanded);
             }}
-          />
+          >
+            <MaterialCommunityIcons name="filter" size={32} color="white" />
+          </Pressable>
         </View>
       </View>
       {scheduleQuery.isLoading && (
