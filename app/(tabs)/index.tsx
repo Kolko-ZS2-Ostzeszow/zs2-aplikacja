@@ -17,7 +17,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 export default function Schedule() {
   const scheme = useColorScheme();
   const insets = useSafeAreaInsets();
-  let [topBarHeightSet, setTopBarHeightSet] = useState(false);
   let [topBarHeight, setTopBarHeight] = useState<number>();
   let [refreshing, setRefreshing] = useState<boolean>(false);
   let [dayId, setDayId] = useState<number>(getBestDayId());
@@ -144,9 +143,8 @@ export default function Schedule() {
     <View style={{ flex: 1, paddingTop: topBarHeight }}>
       <View
         onLayout={(event) => {
-          if (!topBarHeightSet) {
+          if (!filterExpanded) {
             setTopBarHeight(event.nativeEvent.layout.height);
-            setTopBarHeightSet(true);
           }
         }}
         style={{
