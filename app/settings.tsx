@@ -1,15 +1,24 @@
 import { Appearance, ColorSchemeName, Text, View, useColorScheme } from "react-native";
 import { RadioGroup } from "./components/radio_group";
 import { getTextColor } from "./utils/color";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Settings() {
   const scheme = useColorScheme();
+  const savedSelectedTheme = useQuery({
+    queryFn: async () => {
+      return JSON.parse(await AsyncStorage.getItem("theme"));
+    },
+    queryKey: ["theme"]
+  });
 
   return (
     <View>
       <Text style={{ color: getTextColor(scheme), padding: 8, fontSize: 16, fontWeight: 700 }}>Motyw</Text>
       <View>
         <RadioGroup
+          initialvalue={savedSelectedTheme.data == null ? 0 : savedSelectedTheme.data === "light" ? 1 : 2}
           data={[
             {
               label: "Systemowy",
@@ -32,6 +41,8 @@ export default function Settings() {
             color: getTextColor(scheme)
           }}
           onSelect={(value: ColorSchemeName) => {
+            AsyncStorage.setItem("theme", JSON.stringify(value));
+            savedSelectedTheme.refetch();
             Appearance.setColorScheme(value);
           }}
         />
