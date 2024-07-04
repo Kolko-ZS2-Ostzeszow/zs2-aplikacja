@@ -17,9 +17,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 export default function Schedule() {
   const scheme = useColorScheme();
   const insets = useSafeAreaInsets();
-  let [topBarHeight, setTopBarHeight] = useState<number>();
-  let [refreshing, setRefreshing] = useState<boolean>(false);
-  let [dayId, setDayId] = useState<number>(getBestDayId());
+  const [topBarHeight, setTopBarHeight] = useState<number>();
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [dayId, setDayId] = useState<number>(getBestDayId());
   const [filterExpanded, setFilterExpanded] = useState<boolean>(false);
 
   const scheduleQuery = useQuery({
