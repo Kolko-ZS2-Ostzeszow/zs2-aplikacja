@@ -1,5 +1,15 @@
 import { StatusBar } from "expo-status-bar";
-import { Button, FlatList, LayoutAnimation, Pressable, RefreshControl, Text, View, useColorScheme } from "react-native";
+import {
+  Button,
+  FlatList,
+  LayoutAnimation,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+  useColorScheme
+} from "react-native";
 import { Days, fetchEdupageSchedule } from "../utils/edupage";
 import { useEffect, useMemo, useState } from "react";
 import Lesson from "../components/lesson";
@@ -190,7 +200,7 @@ export default function Schedule() {
                 setDayId((dayId - 1 + 5) % 5);
               }}
             />
-            <Text style={{ fontSize: 24, color: "white" }}>{scheduleQuery.data != undefined && Days[dayId].name}</Text>
+            <Text style={{ fontSize: 24, color: "white" }}>{Days[dayId].name}</Text>
             <Button
               title="->"
               onPress={() => {
@@ -213,6 +223,26 @@ export default function Schedule() {
         <Text style={{ alignSelf: "center", padding: "20%", fontSize: 36, color: getTextColor(scheme) }}>
           Ładowanie...
         </Text>
+      )}
+      {scheduleQuery.error != undefined && (
+        <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}></RefreshControl>}>
+          <View style={{ alignSelf: "center", marginVertical: "50%" }}>
+            <Text style={{ alignSelf: "center", fontSize: 24, color: getTextColor(scheme) }}>
+              Nie udało się pobrać planu lekcji
+            </Text>
+            <Text
+              style={{
+                alignSelf: "center",
+                fontSize: 16,
+                color: getTextColor(scheme),
+                fontStyle: "italic",
+                fontFamily: "monospace"
+              }}
+            >
+              {"[" + scheduleQuery.error.message + "]"}
+            </Text>
+          </View>
+        </ScrollView>
       )}
       {scheduleQuery.data != undefined && (
         <FlatList

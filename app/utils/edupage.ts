@@ -49,6 +49,10 @@ export async function fetchEdupageSchedule() {
 
   let fetchedJson = await fetchedData.json();
 
+  if (fetchedJson.r.error) {
+    throw new Error(fetchedJson.r.error);
+  }
+
   let parsedData: ScheduleData = {
     hours: fetchedJson.r.dbiAccessorRes.tables[1].data_rows.map((data: { starttime: string; endtime: string }) => {
       return {
