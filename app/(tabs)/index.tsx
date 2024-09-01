@@ -100,7 +100,13 @@ export default function Schedule() {
   useEffect(() => {
     if (scheduleQuery.data == null || selection.data == null) return;
 
-    setSelectedClass(classes.find((value) => value.label === selection.data.className).value);
+    let foundClass = classes.find((value) => value.label === selection.data.className);
+    if (foundClass === undefined) {
+      setClass(null);
+      return;
+    }
+
+    setSelectedClass(foundClass.value);
   }, [scheduleQuery.data, selection.data, classes]);
 
   useEffect(() => {
@@ -134,7 +140,7 @@ export default function Schedule() {
   function setClass(value: number) {
     setSelectedClass(value);
     let newSelection = {
-      className: classes.find((klasa) => klasa.value === value).label,
+      className: value ? classes.find((klasa) => klasa.value === value).label : null,
       classGroups: []
     };
     AsyncStorage.setItem("selection", JSON.stringify(newSelection));
