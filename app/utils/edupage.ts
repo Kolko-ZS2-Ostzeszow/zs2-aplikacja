@@ -189,7 +189,7 @@ export async function fetchEdupageSchedule() {
         return {
           id: parseInt(data.id.slice(data.id.includes("*") ? 1 : 0, data.id.length)),
           name: data.name,
-          classId: parseInt(data.classid),
+          classId: parseInt(data.classid.slice(data.classid.includes("*") ? 1 : 0, data.classid.length)),
           entireClass: data.entireclass
         };
       }
