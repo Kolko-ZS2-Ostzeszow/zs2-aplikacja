@@ -1,28 +1,91 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchSubstitutionData } from "../utils/edupage";
-import { FlatList, Text, View, useColorScheme } from "react-native";
+import { FlatList, Pressable, Text, View, useColorScheme } from "react-native";
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
-import { Accent1, DarkFg } from "../theme";
+import { Accent1, DarkBg, DarkFg } from "../theme";
 import { getBackgroundColor, getTextColor } from "../utils/color";
+import { useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { throttle } from "../utils/throttle";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
 export default function Substitutions() {
+  const scheme = useColorScheme();
+  const insets = useSafeAreaInsets();
+
+  const [topBarHeight, setTopBarHeight] = useState<number>();
+  const [date, setDate] = useState<Date>(new Date());
+
   const substitutionsQuery = useQuery({
     queryFn: async () => {
-      let data = await fetchSubstitutionData(new Date("2024-05-21"), "classes");
+      let data = await fetchSubstitutionData(date, "classes");
       return data;
     },
-    queryKey: ["substitutions"]
+    queryKey: ["substitutions", date]
   });
 
-  const scheme = useColorScheme();
+  const datePickerPressed = throttle(() => {
+    DateTimePickerAndroid.open({
+      value: date,
+      onChange: (event, selectedDate) => {
+        setDate(selectedDate);
+        substitutionsQuery.refetch();
+      },
+      mode: "date"
+    });
+  }, 100);
 
   return (
-    <View style={{ marginTop: 64, backgroundColor: getBackgroundColor(scheme) }}>
-      {substitutionsQuery.isLoading && <Text style={{ color: getTextColor(scheme) }}>Ładowanie...</Text>}
+    <View style={{ backgroundColor: getBackgroundColor(scheme), paddingTop: topBarHeight }}>
+      <View
+        onLayout={(event) => {
+          setTopBarHeight(event.nativeEvent.layout.height);
+        }}
+        style={{
+          paddingTop: insets.top + 8,
+          paddingBottom: 16,
+          backgroundColor: Accent1,
+          height: "auto",
+          borderBottomLeftRadius: 16,
+          borderBottomRightRadius: 16,
+          position: "absolute",
+          width: "100%",
+          zIndex: 1
+        }}
+      >
+        <View style={{ flexDirection: "row", justifyContent: "center" }}>
+          <Pressable
+            style={{ padding: 4, borderRadius: 8 }}
+            android_ripple={{ radius: 96 }}
+            onPressIn={() => {
+              datePickerPressed();
+            }}
+          >
+            <Text style={{ fontSize: 28, color: "white" }}>
+              {Intl.DateTimeFormat("pl-pl", {
+                weekday: "long",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+              }).format(date) + "r."}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+      {substitutionsQuery.isLoading && (
+        <Text style={{ color: getTextColor(scheme), textAlign: "center", paddingVertical: "50%", fontSize: 36 }}>
+          Ładowanie...
+        </Text>
+      )}
       {substitutionsQuery.isError && (
         <View>
           <Text style={{ color: getTextColor(scheme) }}>{substitutionsQuery.error.message}</Text>
         </View>
+      )}
+      {substitutionsQuery.data?.length === 0 && (
+        <Text style={{ color: getTextColor(scheme), textAlign: "center", paddingVertical: "50%", fontSize: 36 }}>
+          Brak zastępstw
+        </Text>
       )}
       <FlatList
         data={substitutionsQuery.data}
