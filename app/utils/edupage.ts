@@ -242,6 +242,8 @@ export async function fetchSubstitutionData(day: Date, mode: "classes" | "teache
 
   let doc = parse(htmlData);
 
+  if (doc.querySelector(".nosubst")) return [];
+
   let data = doc
     .querySelector("[data-date]")
     .querySelectorAll(".section, .print-nobreak")
