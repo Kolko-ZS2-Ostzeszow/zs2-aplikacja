@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchSubstitutionData } from "../utils/edupage";
 import { FlatList, Pressable, Text, View, useColorScheme } from "react-native";
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
-import { Accent1, DarkBg, DarkFg } from "../theme";
+import { Accent1, DarkFg } from "../theme";
 import { getBackgroundColor, getTextColor } from "../utils/color";
 import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -89,7 +89,7 @@ export default function Substitutions() {
       )}
       <FlatList
         data={substitutionsQuery.data}
-        contentContainerStyle={{ gap: 16 }}
+        contentContainerStyle={{ gap: 16, paddingTop: 8 }}
         renderItem={(data) => {
           return (
             <View>
