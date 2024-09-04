@@ -1,17 +1,11 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs, useRouter } from "expo-router";
+import { router, Tabs } from "expo-router";
 import { Pressable, useColorScheme } from "react-native";
-import { throttle } from "../utils/throttle";
 import { getBackgroundColor } from "../utils/color";
 import { Accent1 } from "../theme";
 
 export default function TabLayout() {
-  const router = useRouter();
   const scheme = useColorScheme();
-
-  const settingsPressed = throttle(() => {
-    router.push("settings");
-  }, 100);
 
   return (
     <Tabs
@@ -47,19 +41,41 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          tabBarButton: (props) => (
-            <Pressable
-              onPress={() => {
-                settingsPressed();
-              }}
-              style={{
-                justifyContent: "center",
-                paddingHorizontal: 24
-              }}
-            >
-              <FontAwesome size={24} name="cog" color="#a3a3a3" />
-            </Pressable>
-          )
+          headerShown: true,
+          title: "Ustawienia",
+          headerTintColor: "white",
+          tabBarIcon: ({ color }) => <FontAwesome size={24} name="cog" color={color} />,
+          headerStyle: {
+            backgroundColor: Accent1
+          },
+          headerLeft: (props) => {
+            return (
+              <Pressable
+                android_ripple={{
+                  color: "#ffffff77",
+                  radius: 18,
+                  borderless: true,
+                  foreground: true
+                }}
+                style={{
+                  marginLeft: 8
+                }}
+                onPress={() => router.back()}
+              >
+                <FontAwesome size={24} name="long-arrow-left" color={"white"}></FontAwesome>
+              </Pressable>
+            );
+          },
+          tabBarStyle: {
+            display: "none"
+          },
+          tabBarLabelStyle: {
+            display: "none"
+          },
+          tabBarItemStyle: {
+            flexGrow: 1,
+            maxWidth: 60
+          }
         }}
       />
     </Tabs>

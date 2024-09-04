@@ -44,7 +44,6 @@ export default function Layout() {
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }}></Stack.Screen>
-        <Stack.Screen name="settings" options={{ title: "Ustawienia" }}></Stack.Screen>
       </Stack>
     </QueryClientProvider>
   );
