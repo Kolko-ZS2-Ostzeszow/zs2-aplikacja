@@ -5,6 +5,7 @@ import { getBackgroundColor } from "./utils/color";
 import { Accent1 } from "./theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect } from "react";
+import { setStatusBarStyle } from "expo-status-bar";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,6 +28,10 @@ export default function Layout() {
       });
 
       Appearance.setColorScheme(savedTheme);
+
+      setTimeout(() => {
+        setStatusBarStyle("light");
+      }, 0);
 
       SplashScreen.hideAsync();
     }

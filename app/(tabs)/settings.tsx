@@ -3,6 +3,7 @@ import { RadioGroup } from "../components/radio_group";
 import { getTextColor } from "../utils/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery } from "@tanstack/react-query";
+import { setStatusBarStyle } from "expo-status-bar";
 
 export default function Settings() {
   const scheme = useColorScheme();
@@ -44,6 +45,9 @@ export default function Settings() {
             AsyncStorage.setItem("theme", JSON.stringify(value));
             savedSelectedTheme.refetch();
             Appearance.setColorScheme(value);
+            setTimeout(() => {
+              setStatusBarStyle("light");
+            }, 0);
           }}
         />
       </View>

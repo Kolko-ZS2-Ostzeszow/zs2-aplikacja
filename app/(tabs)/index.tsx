@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
   FlatList,
   LayoutAnimation,
@@ -291,8 +290,6 @@ export default function Schedule() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}></RefreshControl>}
         />
       )}
-
-      <StatusBar style="light" />
     </View>
   );
 }
