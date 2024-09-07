@@ -181,12 +181,21 @@ export default function Schedule() {
               data={classes}
               externalValue={selectedClass}
               setExternalValue={setClass}
+              placeholder="Wybierz klasę"
+              searchPlaceholder="Szukaj..."
+              placeholderStyle={{
+                color: "gray"
+              }}
             ></DropdownComponent>
             <MultiDropdownComponent
               data={classGroups}
               setExternalValue={setGroups}
               externalValue={selectedGroups}
               placeholder="Wybierz grupę"
+              searchPlaceholder="Szukaj..."
+              placeholderStyle={{
+                color: "gray"
+              }}
             ></MultiDropdownComponent>
           </View>
         )}

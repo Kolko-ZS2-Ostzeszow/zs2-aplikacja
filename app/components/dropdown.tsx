@@ -1,18 +1,21 @@
 import React from "react";
-import { StyleSheet, TextInput } from "react-native";
+import { StyleSheet, TextInput, TextStyle } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
 interface DropdownProps {
   data: { label: string; value: number }[];
   externalValue: any;
   setExternalValue: (value: number) => void;
+  placeholder: string;
+  searchPlaceholder: string;
+  placeholderStyle?: TextStyle;
 }
 
 const DropdownComponent = (props: DropdownProps) => {
   return (
     <Dropdown
       style={styles.dropdown}
-      placeholderStyle={styles.placeholderStyle}
+      placeholderStyle={props.placeholderStyle ? props.placeholderStyle : styles.placeholderStyle}
       selectedTextStyle={styles.selectedTextStyle}
       inputSearchStyle={styles.inputSearchStyle}
       iconStyle={styles.iconStyle}
@@ -21,8 +24,8 @@ const DropdownComponent = (props: DropdownProps) => {
       maxHeight={300}
       labelField="label"
       valueField="value"
-      placeholder="Select item"
-      searchPlaceholder="Search..."
+      placeholder={props.placeholder}
+      searchPlaceholder={props.searchPlaceholder}
       value={props.externalValue}
       onChange={(item) => {
         props.setExternalValue(item.value);
@@ -33,7 +36,7 @@ const DropdownComponent = (props: DropdownProps) => {
           onChangeText={(text) => {
             onSearch(text);
           }}
-          placeholder="Search..."
+          placeholder={props.searchPlaceholder}
         ></TextInput>
       )}
     />

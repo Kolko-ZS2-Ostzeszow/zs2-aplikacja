@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, TextInput } from "react-native";
+import { StyleSheet, TextInput, TextStyle } from "react-native";
 import { MultiSelect } from "react-native-element-dropdown";
 
 interface MultiDropdownProps {
@@ -7,13 +7,15 @@ interface MultiDropdownProps {
   externalValue: any[];
   setExternalValue: (value: number[]) => void;
   placeholder: string;
+  searchPlaceholder: string;
+  placeholderStyle?: TextStyle;
 }
 
 const MultiDropdownComponent = (props: MultiDropdownProps) => {
   return (
     <MultiSelect
       style={styles.dropdown}
-      placeholderStyle={styles.placeholderStyle}
+      placeholderStyle={props.placeholderStyle ? props.placeholderStyle : styles.placeholderStyle}
       selectedTextStyle={styles.selectedTextStyle}
       iconStyle={styles.iconStyle}
       data={props.data}
@@ -33,7 +35,7 @@ const MultiDropdownComponent = (props: MultiDropdownProps) => {
           onChangeText={(text) => {
             onSearch(text);
           }}
-          placeholder="Search..."
+          placeholder={props.searchPlaceholder}
         ></TextInput>
       )}
     />
