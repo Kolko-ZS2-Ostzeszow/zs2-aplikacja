@@ -1,4 +1,4 @@
-import { Dimensions, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { Accent1 } from "../theme";
 
 interface LessonProps {
@@ -6,6 +6,7 @@ interface LessonProps {
   name: string;
   classroom: string | null;
   teacher: string;
+  group: string | null;
 }
 
 export default function Lesson(props: LessonProps) {
@@ -31,7 +32,7 @@ export default function Lesson(props: LessonProps) {
       <Text style={{ color: "white", fontWeight: "bold", fontSize: 36, padding: 4 }}>{props.id}</Text>
       <Text style={{ color: "white", fontSize: 18, flexShrink: 1 }}>{name}</Text>
       <Text style={{ color: "white", fontSize: 14, position: "absolute", right: 12, top: 6, textAlign: "right" }}>
-        {props.classroom}
+        {props.group ? `${props.group} • ${props.classroom}` : props.classroom}
       </Text>
       <Text style={{ color: "white", fontSize: 14, position: "absolute", right: 12, bottom: 6, textAlign: "right" }}>
         {props.teacher}

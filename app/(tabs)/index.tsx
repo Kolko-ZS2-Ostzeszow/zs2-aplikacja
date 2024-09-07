@@ -83,14 +83,17 @@ export default function Schedule() {
         return a.hourId - b.hourId;
       })
       .flatMap((obj) => {
-        let data: { hourId: number; name: string; classroom: string | null; teacher: string }[] = [];
+        let data: { hourId: number; name: string; classroom: string | null; teacher: string; group: string | null }[] =
+          [];
         const hourId = obj.hourId;
         for (let i = 0; i < obj.duration; i++) {
           data[i] = {
             hourId: hourId + i,
             name: scheduleQuery.data.subjects.find((subject) => subject.id === obj.subjectId).name,
             classroom: scheduleQuery.data.classrooms.find((classroom) => classroom.id === obj.classroomId).short,
-            teacher: scheduleQuery.data.teachers.find((teacher) => teacher.id === obj.teacherId).short
+            teacher: scheduleQuery.data.teachers.find((teacher) => teacher.id === obj.teacherId).short,
+            group: scheduleQuery.data.groups.find((group) => obj.groupIds.includes(group.id) && !group.entireClass)
+              ?.name
           };
         }
         return data;
@@ -275,7 +278,13 @@ export default function Schedule() {
                     "-" +
                     scheduleQuery.data.hours[item.hourId].endTime}
                 </Text>
-                <Lesson id={item.hourId + 1} name={item.name} classroom={item.classroom} teacher={item.teacher} />
+                <Lesson
+                  id={item.hourId + 1}
+                  name={item.name}
+                  classroom={item.classroom}
+                  teacher={item.teacher}
+                  group={item.group}
+                />
               </View>
             );
           }}
