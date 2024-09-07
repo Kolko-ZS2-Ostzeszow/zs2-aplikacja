@@ -1,6 +1,5 @@
 import { StatusBar } from "expo-status-bar";
 import {
-  Button,
   FlatList,
   LayoutAnimation,
   Pressable,
@@ -23,6 +22,7 @@ import { Selection } from "../selection";
 import { getTextColor } from "../utils/color";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function Schedule() {
   const scheme = useColorScheme();
@@ -190,7 +190,7 @@ export default function Schedule() {
             ></MultiDropdownComponent>
           </View>
         )}
-        <View style={{ flexDirection: "row", gap: 16 }}>
+        <View style={{ flexDirection: "row", gap: 18, paddingHorizontal: 8 }}>
           <View
             style={{
               flexDirection: "row",
@@ -200,22 +200,27 @@ export default function Schedule() {
               paddingHorizontal: 8
             }}
           >
-            <Button
-              title="<-"
+            <Pressable
               onPress={() => {
                 setDayId((dayId - 1 + 5) % 5);
               }}
-            />
-            <Text style={{ fontSize: 24, color: "white" }}>{Days[dayId].name}</Text>
-            <Button
-              title="->"
+              android_ripple={{ radius: 22, color: "#ffffff77", borderless: true }}
+            >
+              <FontAwesome size={32} name="long-arrow-left" color={"white"}></FontAwesome>
+            </Pressable>
+            <Text style={{ fontSize: 28, color: "white" }}>{Days[dayId].name}</Text>
+            <Pressable
               onPress={() => {
                 setDayId((dayId + 1) % 5);
               }}
-            />
+              android_ripple={{ radius: 22, color: "#ffffff77", borderless: true }}
+            >
+              <FontAwesome size={32} name="long-arrow-right" color={"white"}></FontAwesome>
+            </Pressable>
           </View>
           <Pressable
             style={{ padding: 8, justifyContent: "center" }}
+            android_ripple={{ radius: 22, color: "#ffffff77" }}
             onPress={() => {
               LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
               setFilterExpanded(!filterExpanded);
