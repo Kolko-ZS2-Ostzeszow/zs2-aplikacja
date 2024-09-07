@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { throttle } from "../utils/throttle";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function Substitutions() {
   const scheme = useColorScheme();
@@ -55,13 +56,14 @@ export default function Substitutions() {
       >
         <View style={{ flexDirection: "row", justifyContent: "center" }}>
           <Pressable
-            style={{ padding: 4, borderRadius: 8 }}
-            android_ripple={{ radius: 96 }}
-            onPressIn={() => {
+            style={{ padding: 4, borderRadius: 8, flexDirection: "row", alignItems: "center", gap: 8 }}
+            android_ripple={{ radius: 148, color: "#ffffff77" }}
+            onPress={() => {
               datePickerPressed();
             }}
           >
-            <Text style={{ fontSize: 28, color: "white" }}>
+            <FontAwesome size={26} name="calendar" color={"white"}></FontAwesome>
+            <Text style={{ fontSize: 28, color: "white", textDecorationLine: "underline" }}>
               {Intl.DateTimeFormat("pl-pl", {
                 weekday: "long",
                 day: "2-digit",
