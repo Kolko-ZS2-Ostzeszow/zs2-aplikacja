@@ -164,8 +164,8 @@ export default function Schedule() {
           }
         }}
         style={{
-          paddingTop: insets.top + 12,
-          paddingBottom: 24,
+          paddingTop: insets.top + 8,
+          paddingBottom: 14,
           backgroundColor: Accent1,
           height: "auto",
           borderBottomLeftRadius: 16,
