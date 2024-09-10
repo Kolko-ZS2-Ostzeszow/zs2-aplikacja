@@ -148,7 +148,7 @@ export async function fetchEdupageSchedule() {
               dayId = 4;
               break;
             default:
-              return -1;
+              continue;
           }
 
           let hourId = parseInt(card.period) - 1;
