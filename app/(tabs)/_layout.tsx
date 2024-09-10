@@ -58,7 +58,7 @@ export default function TabLayout() {
                   foreground: true
                 }}
                 style={{
-                  marginLeft: 8
+                  marginLeft: 12
                 }}
                 onPress={() => router.back()}
               >
