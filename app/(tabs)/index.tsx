@@ -271,8 +271,8 @@ export default function Schedule() {
           data={lessons}
           renderItem={({ item, index }) => {
             return (
-              <View style={{ marginTop: 12, marginBottom: 12 }}>
-                <Text style={{ color: scheme === "light" ? "black" : "white" }}>
+              <View style={{ marginTop: 12, marginBottom: 10 }}>
+                <Text style={{ color: scheme === "light" ? "black" : "white", marginLeft: 2, marginBottom: 2 }}>
                   {scheduleQuery.data.hours[item.hourId].startTime +
                     "-" +
                     scheduleQuery.data.hours[item.hourId].endTime}
