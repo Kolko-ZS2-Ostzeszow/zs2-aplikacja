@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
-import { Appearance, Platform, UIManager, useColorScheme } from "react-native";
+import { Appearance, useColorScheme } from "react-native";
 import { getBackgroundColor } from "./utils/color";
 import { Accent1 } from "./theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -12,10 +12,6 @@ import { ErrorBoundary } from "./utils/error_boundary";
 SplashScreen.preventAutoHideAsync();
 
 var queryClient = new QueryClient();
-
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 export default function Layout() {
   const scheme = useColorScheme();

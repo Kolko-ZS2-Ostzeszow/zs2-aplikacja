@@ -1,13 +1,4 @@
-import {
-  FlatList,
-  LayoutAnimation,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-  useColorScheme
-} from "react-native";
+import { FlatList, Pressable, RefreshControl, ScrollView, Text, View, useColorScheme } from "react-native";
 import { Days, fetchEdupageSchedule } from "../utils/edupage";
 import { useEffect, useMemo, useState } from "react";
 import Lesson from "../components/lesson";
@@ -22,6 +13,7 @@ import { getTextColor } from "../utils/color";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Animated, { FadeIn, FadeOut, LinearTransition, useSharedValue, withTiming } from "react-native-reanimated";
 
 export default function Schedule() {
   const scheme = useColorScheme();
@@ -157,14 +149,65 @@ export default function Schedule() {
     AsyncStorage.setItem("selection", JSON.stringify(newSelection));
   }
 
+  const animationDistance = 150;
+  const animationDuration = 300;
+
+  const flipAnimDir = useSharedValue(false);
+  const haventInteractedWithDay = useSharedValue(true);
+
+  const entering = (values) => {
+    "worklet";
+    const animations = haventInteractedWithDay.value
+      ? {}
+      : {
+          originX: withTiming(values.targetOriginX, {
+            duration: animationDuration
+          }),
+          opacity: withTiming(1, {
+            duration: animationDuration
+          })
+        };
+    const initialValues = haventInteractedWithDay.value
+      ? { originX: values.targetOriginX, opacity: 1 }
+      : {
+          originX: values.targetOriginX - animationDistance * (flipAnimDir.value ? -1 : 1),
+          opacity: 0
+        };
+    return {
+      initialValues,
+      animations
+    };
+  };
+
+  const exiting = (values) => {
+    "worklet";
+    const animations = {
+      originX: withTiming(values.currentOriginX + animationDistance * (flipAnimDir.value ? -1 : 1), {
+        duration: animationDuration
+      }),
+      opacity: withTiming(0, {
+        duration: animationDuration
+      })
+    };
+    const initialValues = {
+      originX: values.currentOriginX,
+      opacity: 1
+    };
+    return {
+      initialValues,
+      animations
+    };
+  };
+
   return (
     <View style={{ flex: 1, paddingTop: topBarHeight }}>
-      <View
+      <Animated.View
         onLayout={(event) => {
           if (!filterExpanded) {
             setTopBarHeight(event.nativeEvent.layout.height);
           }
         }}
+        layout={LinearTransition}
         style={{
           paddingTop: insets.top + 8,
           paddingBottom: 14,
@@ -178,7 +221,7 @@ export default function Schedule() {
         }}
       >
         {filterExpanded && (
-          <View>
+          <Animated.View entering={FadeIn} exiting={FadeOut}>
             <DropdownComponent
               data={classes}
               externalValue={selectedClass}
@@ -199,9 +242,9 @@ export default function Schedule() {
                 color: "gray"
               }}
             ></MultiDropdownComponent>
-          </View>
+          </Animated.View>
         )}
-        <View style={{ flexDirection: "row", gap: 18, paddingHorizontal: 8 }}>
+        <Animated.View layout={LinearTransition} style={{ flexDirection: "row", gap: 18, paddingHorizontal: 8 }}>
           <View
             style={{
               flexDirection: "row",
@@ -213,15 +256,28 @@ export default function Schedule() {
           >
             <Pressable
               onPress={() => {
+                flipAnimDir.value = true;
+                haventInteractedWithDay.value = false;
                 setDayId((dayId - 1 + 5) % 5);
               }}
               android_ripple={{ radius: 22, color: "#ffffff77", borderless: true }}
             >
               <FontAwesome size={32} name="long-arrow-left" color={"white"}></FontAwesome>
             </Pressable>
-            <Text style={{ fontSize: 28, color: "white" }}>{Days[dayId].name}</Text>
+            <View style={{ overflow: "hidden", flex: 1, marginHorizontal: 4 }}>
+              <Animated.Text
+                key={Days[dayId].name}
+                entering={entering}
+                exiting={exiting}
+                style={{ fontSize: 28, color: "white", textAlign: "center" }}
+              >
+                {Days[dayId].name}
+              </Animated.Text>
+            </View>
             <Pressable
               onPress={() => {
+                flipAnimDir.value = false;
+                haventInteractedWithDay.value = false;
                 setDayId((dayId + 1) % 5);
               }}
               android_ripple={{ radius: 22, color: "#ffffff77", borderless: true }}
@@ -233,14 +289,13 @@ export default function Schedule() {
             style={{ padding: 8, justifyContent: "center" }}
             android_ripple={{ radius: 22, color: "#ffffff77" }}
             onPress={() => {
-              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
               setFilterExpanded(!filterExpanded);
             }}
           >
             <MaterialCommunityIcons name="filter" size={32} color="white" />
           </Pressable>
-        </View>
-      </View>
+        </Animated.View>
+      </Animated.View>
       {scheduleQuery.isLoading && (
         <Text style={{ alignSelf: "center", padding: "20%", fontSize: 36, color: getTextColor(scheme) }}>
           Ładowanie...
