@@ -6,6 +6,8 @@ import { Accent1 } from "./theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect } from "react";
 import { setStatusBarStyle } from "expo-status-bar";
+import { Try } from "expo-router/build/views/Try";
+import { ErrorBoundary } from "./utils/error_boundary";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -40,16 +42,18 @@ export default function Layout() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Stack
-        screenOptions={{
-          contentStyle: { backgroundColor: getBackgroundColor(scheme) },
-          headerStyle: { backgroundColor: Accent1 },
-          headerTintColor: "white"
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }}></Stack.Screen>
-      </Stack>
-    </QueryClientProvider>
+    <Try catch={ErrorBoundary}>
+      <QueryClientProvider client={queryClient}>
+        <Stack
+          screenOptions={{
+            contentStyle: { backgroundColor: getBackgroundColor(scheme) },
+            headerStyle: { backgroundColor: Accent1 },
+            headerTintColor: "white"
+          }}
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }}></Stack.Screen>
+        </Stack>
+      </QueryClientProvider>
+    </Try>
   );
 }
