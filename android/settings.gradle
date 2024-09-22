@@ -44,7 +44,7 @@ if (getRNMinorVersion() >= 75) {
   }
 }
 
-rootProject.name = 'zs2-aplikacja'
+rootProject.name = 'Plan ZS2'
 
 dependencyResolutionManagement {
   versionCatalogs {
