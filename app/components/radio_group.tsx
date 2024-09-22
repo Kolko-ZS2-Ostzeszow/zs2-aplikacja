@@ -1,6 +1,7 @@
-import { Pressable, View, Text, ViewStyle, TextStyle } from "react-native";
+import { Pressable, View, Text, ViewStyle, TextStyle, LayoutAnimation } from "react-native";
 import { Accent1 } from "../theme";
 import { useState } from "react";
+import Animated, { EntryAnimationsValues, useSharedValue, withTiming, ZoomIn, ZoomOut } from "react-native-reanimated";
 
 interface RadioGroupProps {
   data: { label: string; value: string }[];
@@ -45,6 +46,41 @@ export function RadioGroup(props: RadioGroupProps) {
   };
 
   const [selected, setSelected] = useState(props.initialvalue ?? 0);
+  const haventInteractedWithButton = useSharedValue(true);
+
+  const entering = () => {
+    "worklet";
+    const animations = haventInteractedWithButton.value
+      ? {}
+      : {
+          transform: [
+            {
+              scale: withTiming(1, {
+                duration: 150
+              })
+            }
+          ]
+        };
+    const initialValues = haventInteractedWithButton.value
+      ? {
+          transform: [
+            {
+              scale: 1
+            }
+          ]
+        }
+      : {
+          transform: [
+            {
+              scale: 0
+            }
+          ]
+        };
+    return {
+      initialValues,
+      animations
+    };
+  };
 
   return (
     <View style={containerStyle}>
@@ -54,11 +90,18 @@ export function RadioGroup(props: RadioGroupProps) {
             <Pressable
               style={radioButtonStyle}
               onPress={() => {
+                // eslint-disable-next-line react-compiler/react-compiler
+                haventInteractedWithButton.value = false;
                 setSelected(i);
                 if (props.onSelect != null) props.onSelect(data.value);
               }}
             >
-              <View style={{ ...radioButtonIndicatorStyle, display: selected === i ? "flex" : "none" }}></View>
+              <Animated.View
+                key={selected}
+                entering={entering}
+                exiting={ZoomOut.duration(150)}
+                style={{ ...radioButtonIndicatorStyle, display: selected === i ? "flex" : "none" }}
+              ></Animated.View>
             </Pressable>
             <Text style={radioTextStyle}>{data.label}</Text>
           </View>
