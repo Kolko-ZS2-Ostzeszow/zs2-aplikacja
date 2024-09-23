@@ -43,7 +43,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
           style={({ pressed }) => (pressed ? { backgroundColor: "#444444" } : { backgroundColor: "#222222" })}
           onPress={retry}
         >
-          <Text style={{ color: "white", padding: 16 }}>Odświerz</Text>
+          <Text style={{ color: "white", padding: 16 }}>Odśwież</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => (pressed ? { backgroundColor: "#444444" } : { backgroundColor: "#222222" })}
