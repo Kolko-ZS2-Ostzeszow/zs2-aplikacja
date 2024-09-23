@@ -170,7 +170,7 @@ export default function Schedule() {
     const initialValues = haventInteractedWithDay.value
       ? { originX: values.targetOriginX, opacity: 1 }
       : {
-          originX: values.targetOriginX - animationDistance * (flipAnimDir.value ? -1 : 1),
+          originX: values.targetOriginX - animationDistance * (flipAnimDir.value ? 1 : -1),
           opacity: 0
         };
     return {
@@ -182,7 +182,7 @@ export default function Schedule() {
   const exiting = (values) => {
     "worklet";
     const animations = {
-      originX: withTiming(values.currentOriginX + animationDistance * (flipAnimDir.value ? -1 : 1), {
+      originX: withTiming(values.currentOriginX + animationDistance * (flipAnimDir.value ? 1 : -1), {
         duration: animationDuration
       }),
       opacity: withTiming(0, {
