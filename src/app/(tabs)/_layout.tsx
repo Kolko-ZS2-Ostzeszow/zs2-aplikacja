@@ -1,8 +1,8 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { router, Tabs } from "expo-router";
 import { Pressable, useColorScheme } from "react-native";
-import { getBackgroundColor } from "../utils/color";
-import { Accent1 } from "../theme";
+import { getBackgroundColor } from "../../utils/color";
+import { Accent1 } from "../../theme";
 
 export default function TabLayout() {
   const scheme = useColorScheme();
