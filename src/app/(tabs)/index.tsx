@@ -81,7 +81,7 @@ export default function Schedule() {
           data[i] = {
             hourId: hourId + i,
             name: scheduleQuery.data.subjects.find((subject) => subject.id === obj.subjectId).name,
-            classroom: scheduleQuery.data.classrooms.find((classroom) => classroom.id === obj.classroomId).short,
+            classroom: scheduleQuery.data.classrooms.find((classroom) => classroom.id === obj.classroomId)?.short,
             teacher: scheduleQuery.data.teachers.find((teacher) => teacher.id === obj.teacherId).short,
             group: scheduleQuery.data.groups.find((group) => obj.groupIds.includes(group.id) && !group.entireClass)
               ?.name
