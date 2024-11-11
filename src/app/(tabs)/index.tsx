@@ -1,6 +1,6 @@
 import { FlatList, Pressable, RefreshControl, ScrollView, Text, View, useColorScheme } from "react-native";
 import { Days, fetchEdupageSchedule, ScheduleData } from "../../utils/edupage";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Lesson from "../../components/lesson";
 import { Accent1, Accent2 } from "../../theme";
 import DropdownComponent from "../../components/dropdown";
@@ -56,7 +56,10 @@ export default function Schedule() {
   const [selectedClass, setSelectedClass] = useState<number>(null);
   const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
 
-  const currentData = scheduleQuery.data == undefined ? cachedScheduleQuery.data : scheduleQuery.data;
+  const currentData = useMemo(
+    () => (scheduleQuery.data == undefined ? cachedScheduleQuery.data : scheduleQuery.data),
+    []
+  );
 
   const [classes, lessons, classGroups] = useSchedule(
     currentData,
@@ -65,7 +68,8 @@ export default function Schedule() {
     selectedClass,
     selectedGroups,
     setClass,
-    setGroups
+    setSelectedClass,
+    setSelectedGroups
   );
 
   const onRefresh = React.useCallback(() => {

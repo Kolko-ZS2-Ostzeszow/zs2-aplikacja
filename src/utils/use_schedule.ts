@@ -19,6 +19,7 @@ export function useSchedule(
   selectedClass: number | null,
   selectedGroups: number[],
   setClass: (value: number) => void,
+  setSelectedClass: (value: number) => void,
   setGroups: (value: number[]) => void
 ): [LabelValue[], LessonData[], LabelValue[]] {
   const classes = useMemo(() => {
@@ -76,7 +77,7 @@ export function useSchedule(
       return;
     }
 
-    setClass(foundClass.value);
+    setSelectedClass(foundClass.value);
   }, [data, selection, classes]);
 
   useEffect(() => {
