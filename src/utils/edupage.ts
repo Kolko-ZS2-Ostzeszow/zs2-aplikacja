@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import parse from "node-html-parser";
 
 export class ScheduleData {
@@ -207,6 +208,7 @@ export async function fetchEdupageSchedule() {
     return usedGroups.includes(value.id);
   });
 
+  await AsyncStorage.setItem("data-cache", JSON.stringify(parsedData));
   return parsedData;
 }
 

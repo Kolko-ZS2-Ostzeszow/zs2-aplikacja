@@ -1,8 +1,8 @@
 import { FlatList, Pressable, RefreshControl, ScrollView, Text, View, useColorScheme } from "react-native";
-import { Days, fetchEdupageSchedule } from "../../utils/edupage";
+import { Days, fetchEdupageSchedule, ScheduleData } from "../../utils/edupage";
 import { useEffect, useMemo, useState } from "react";
 import Lesson from "../../components/lesson";
-import { Accent1 } from "../../theme";
+import { Accent1, Accent2 } from "../../theme";
 import DropdownComponent from "../../components/dropdown";
 import MultiDropdownComponent from "../../components/multi_dropdown";
 import React from "react";
@@ -25,6 +25,17 @@ export default function Schedule() {
   const [dayId, setDayId] = useState<number>(getBestDayId());
   const [filterExpanded, setFilterExpanded] = useState<boolean>(false);
 
+  const cachedScheduleQuery = useQuery({
+    queryFn: async () => {
+      const cachedDataJson = await AsyncStorage.getItem("data-cache");
+
+      if (cachedDataJson == null) return null;
+
+      return JSON.parse(cachedDataJson) as ScheduleData;
+    },
+    queryKey: ["schedule-cache"]
+  });
+
   const scheduleQuery = useQuery({
     queryFn: async () => {
       return await fetchEdupageSchedule();
@@ -35,7 +46,6 @@ export default function Schedule() {
   const selection = useQuery({
     queryFn: async () => {
       let data = await AsyncStorage.getItem("selection");
-
       if (data == null) return null;
 
       return JSON.parse(data) as Selection;
@@ -46,8 +56,10 @@ export default function Schedule() {
   const [selectedClass, setSelectedClass] = useState<number>(null);
   const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
 
+  const currentData = scheduleQuery.data == undefined ? cachedScheduleQuery.data : scheduleQuery.data;
+
   const [classes, lessons, classGroups] = useSchedule(
-    scheduleQuery.data,
+    currentData,
     selection.data,
     dayId,
     selectedClass,
@@ -142,7 +154,6 @@ export default function Schedule() {
         layout={LinearTransition}
         style={{
           paddingTop: insets.top + 8,
-          paddingBottom: 14,
           backgroundColor: Accent1,
           height: "auto",
           borderBottomLeftRadius: 16,
@@ -176,7 +187,10 @@ export default function Schedule() {
             ></MultiDropdownComponent>
           </Animated.View>
         )}
-        <Animated.View layout={LinearTransition} style={{ flexDirection: "row", gap: 18, paddingHorizontal: 8 }}>
+        <Animated.View
+          layout={LinearTransition}
+          style={{ flexDirection: "row", gap: 18, paddingHorizontal: 8, marginBottom: 8 }}
+        >
           <View
             style={{
               flexDirection: "row",
@@ -227,42 +241,31 @@ export default function Schedule() {
             <MaterialCommunityIcons name="filter" size={32} color="white" />
           </Pressable>
         </Animated.View>
+        {(scheduleQuery.isLoading || scheduleQuery.isError) && (
+          <Animated.View
+            style={{
+              backgroundColor: Accent2,
+              marginTop: -4,
+              borderBottomRightRadius: 16,
+              borderBottomLeftRadius: 16,
+              bottom: 0,
+              padding: 2
+            }}
+          >
+            <Text style={{ color: "white", textAlign: "center" }}>
+              {scheduleQuery.isLoading ? "Ładowanie z internetu..." : "Wystąpił błąd"}
+            </Text>
+          </Animated.View>
+        )}
       </Animated.View>
-      {scheduleQuery.isLoading && (
-        <Text style={{ alignSelf: "center", padding: "20%", fontSize: 36, color: getTextColor(scheme) }}>
-          Ładowanie...
-        </Text>
-      )}
-      {scheduleQuery.error != undefined && (
-        <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}></RefreshControl>}>
-          <View style={{ alignSelf: "center", marginVertical: "50%" }}>
-            <Text style={{ alignSelf: "center", fontSize: 24, color: getTextColor(scheme) }}>
-              Nie udało się pobrać planu lekcji
-            </Text>
-            <Text
-              style={{
-                alignSelf: "center",
-                fontSize: 16,
-                color: getTextColor(scheme),
-                fontStyle: "italic",
-                fontFamily: "monospace"
-              }}
-            >
-              {"[" + scheduleQuery.error.message + "]"}
-            </Text>
-          </View>
-        </ScrollView>
-      )}
-      {scheduleQuery.data != undefined && (
+      {currentData != undefined && (
         <FlatList
           data={lessons}
           renderItem={({ item, index }) => {
             return (
               <View style={{ marginTop: 12, marginBottom: 10 }}>
                 <Text style={{ color: scheme === "light" ? "black" : "white", marginLeft: 2, marginBottom: 2 }}>
-                  {scheduleQuery.data.hours[item.hourId].startTime +
-                    "-" +
-                    scheduleQuery.data.hours[item.hourId].endTime}
+                  {currentData.hours[item.hourId].startTime + "-" + currentData.hours[item.hourId].endTime}
                 </Text>
                 <Lesson
                   id={item.hourId + 1}
