@@ -1,7 +1,7 @@
-import { Pressable, View, Text, ViewStyle, TextStyle, LayoutAnimation } from "react-native";
+import { Pressable, View, Text, ViewStyle, TextStyle } from "react-native";
 import { Accent1 } from "../theme";
 import { useState } from "react";
-import Animated, { EntryAnimationsValues, useSharedValue, withTiming, ZoomIn, ZoomOut } from "react-native-reanimated";
+import Animated, { useSharedValue, withTiming, ZoomOut } from "react-native-reanimated";
 
 interface RadioGroupProps {
   data: { label: string; value: string }[];

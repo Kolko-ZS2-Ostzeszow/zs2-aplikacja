@@ -1,6 +1,6 @@
-import { FlatList, Pressable, RefreshControl, ScrollView, Text, View, useColorScheme } from "react-native";
+import { FlatList, Pressable, RefreshControl, Text, View, useColorScheme } from "react-native";
 import { Days, fetchEdupageSchedule, ScheduleData } from "../../utils/edupage";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Lesson from "../../components/lesson";
 import { Accent1, Accent2 } from "../../theme";
 import DropdownComponent from "../../components/dropdown";
@@ -9,7 +9,6 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Selection } from "../../selection";
-import { getTextColor } from "../../utils/color";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
