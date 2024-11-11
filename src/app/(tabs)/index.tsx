@@ -15,6 +15,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Animated, { FadeIn, FadeOut, LinearTransition, useSharedValue, withTiming } from "react-native-reanimated";
 import { getBestDayId } from "../../utils/get_best_day";
+import { useSchedule } from "../../utils/use_schedule";
 
 export default function Schedule() {
   const scheme = useColorScheme();
@@ -42,76 +43,18 @@ export default function Schedule() {
     queryKey: ["selection"]
   });
 
-  const classes = useMemo(() => {
-    if (scheduleQuery.data == null) return [];
-
-    return scheduleQuery.data.classes.map((classValue) => {
-      return { label: classValue.name, value: classValue.id };
-    });
-  }, [scheduleQuery.data]);
   const [selectedClass, setSelectedClass] = useState<number>(null);
-
-  const classGroups = useMemo(() => {
-    if (scheduleQuery.data == null || selectedClass == null) return [];
-
-    return scheduleQuery.data.groups
-      .filter((grupa) => grupa.classId === selectedClass && !grupa.entireClass)
-      .map((grupa) => {
-        return { label: grupa.name, value: grupa.id };
-      });
-  }, [scheduleQuery.data, selectedClass]);
   const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
 
-  const lessons = useMemo(() => {
-    if (scheduleQuery.data == null || selectedClass == null) return [];
-
-    const groupId = scheduleQuery.data.groups.find((grupa) => grupa.classId === selectedClass && grupa.entireClass).id;
-
-    return scheduleQuery.data.lessons
-      .filter((lesson) => {
-        return lesson.groupIds.some((id) => [...selectedGroups, groupId].includes(id)) && lesson.dayId === dayId;
-      })
-      .sort((a, b) => {
-        return a.hourId - b.hourId;
-      })
-      .flatMap((obj) => {
-        let data: { hourId: number; name: string; classroom: string | null; teacher: string; group: string | null }[] =
-          [];
-        const hourId = obj.hourId;
-        for (let i = 0; i < obj.duration; i++) {
-          data[i] = {
-            hourId: hourId + i,
-            name: scheduleQuery.data.subjects.find((subject) => subject.id === obj.subjectId).name,
-            classroom: scheduleQuery.data.classrooms.find((classroom) => classroom.id === obj.classroomId)?.short,
-            teacher: scheduleQuery.data.teachers.find((teacher) => teacher.id === obj.teacherId).short,
-            group: scheduleQuery.data.groups.find((group) => obj.groupIds.includes(group.id) && !group.entireClass)
-              ?.name
-          };
-        }
-        return data;
-      });
-  }, [scheduleQuery.data, selectedClass, selectedGroups, dayId]);
-
-  useEffect(() => {
-    if (scheduleQuery.data == null || selection.data == null) return;
-
-    let foundClass = classes.find((value) => value.label === selection.data.className);
-    if (foundClass === undefined) {
-      setClass(null);
-      return;
-    }
-
-    setSelectedClass(foundClass.value);
-  }, [scheduleQuery.data, selection.data, classes]);
-
-  useEffect(() => {
-    if (scheduleQuery.data == null || selection.data == null || selectedClass == null || classGroups.length === 0)
-      return;
-
-    setSelectedGroups(
-      classGroups.filter((value) => selection.data.classGroups.includes(value.label)).map((value) => value.value)
-    );
-  }, [scheduleQuery.data, selection.data, selectedClass, classGroups]);
+  const [classes, lessons, classGroups] = useSchedule(
+    scheduleQuery.data,
+    selection.data,
+    dayId,
+    selectedClass,
+    selectedGroups,
+    setClass,
+    setGroups
+  );
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
