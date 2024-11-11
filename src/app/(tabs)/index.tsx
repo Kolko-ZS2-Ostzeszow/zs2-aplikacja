@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Animated, { FadeIn, FadeOut, LinearTransition, useSharedValue, withTiming } from "react-native-reanimated";
+import { getBestDayId } from "../../utils/get_best_day";
 
 export default function Schedule() {
   const scheme = useColorScheme();
@@ -111,18 +112,6 @@ export default function Schedule() {
       classGroups.filter((value) => selection.data.classGroups.includes(value.label)).map((value) => value.value)
     );
   }, [scheduleQuery.data, selection.data, selectedClass, classGroups]);
-
-  function getBestDayId(): number {
-    const date = new Date();
-    const day = date.getDay();
-    // monday to friday
-
-    if (day >= 1 && day <= 5) {
-      return day - 1;
-    } else {
-      return 0;
-    }
-  }
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
