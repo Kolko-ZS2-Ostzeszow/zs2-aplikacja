@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
 import { Appearance, useColorScheme } from "react-native";
 import { getBackgroundColor } from "../utils/color";
@@ -12,7 +12,13 @@ import { ScheduleData } from "../utils/edupage";
 
 SplashScreen.preventAutoHideAsync();
 
-var queryClient = new QueryClient();
+var queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      //TODO: add sending errors to backend here
+    }
+  })
+});
 queryClient.prefetchQuery({
   queryFn: async () => {
     const cachedDataJson = await AsyncStorage.getItem("data-cache");
