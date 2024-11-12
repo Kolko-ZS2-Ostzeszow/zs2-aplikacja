@@ -16,7 +16,7 @@
     "@react-native-community/datetimepicker": "8.2.0",
     "@tanstack/react-query": "^5.40.1",
     "@types/react": "~18.3.12",
-    "eslint-plugin-react-compiler": "^0.0.0-experimental-51a85ea-20240601",
+    "eslint-plugin-react-compiler": "^19.0.0-beta-a7bf2bd-20241110",
     "expo": "^52.0.3",
     "expo-clipboard": "~7.0.0",
     "expo-constants": "~17.0.2",
