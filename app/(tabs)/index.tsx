@@ -1,12 +1,12 @@
 import { FlatList, Pressable, RefreshControl, Text, View, useColorScheme } from "react-native";
 import { Days, fetchEdupageSchedule, ScheduleData } from "../../src/utils/edupage";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Lesson from "../../src/components/lesson";
 import { Accent1, Accent2 } from "../../src/theme";
 import DropdownComponent from "../../src/components/dropdown";
 import MultiDropdownComponent from "../../src/components/multi_dropdown";
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Selection } from "../../src/selection";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -19,6 +19,7 @@ import { useSchedule } from "../../src/utils/use_schedule";
 export default function Schedule() {
   const scheme = useColorScheme();
   const insets = useSafeAreaInsets();
+  const queryClient = useQueryClient();
   const [topBarHeight, setTopBarHeight] = useState<number>();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [dayId, setDayId] = useState<number>(getBestDayId());
@@ -55,10 +56,7 @@ export default function Schedule() {
   const [selectedClass, setSelectedClass] = useState<number>(null);
   const [selectedGroups, setSelectedGroups] = useState<number[]>([]);
 
-  const currentData = useMemo(
-    () => (scheduleQuery.data == undefined ? cachedScheduleQuery.data : scheduleQuery.data),
-    []
-  );
+  const currentData = scheduleQuery.data == undefined ? cachedScheduleQuery.data : scheduleQuery.data;
 
   const [classes, lessons, classGroups] = useSchedule(
     currentData,
@@ -85,6 +83,7 @@ export default function Schedule() {
       classGroups: []
     };
     AsyncStorage.setItem("selection", JSON.stringify(newSelection));
+    queryClient.setQueryData(["selection"], newSelection);
   }
 
   function setGroups(value: number[]) {
@@ -94,6 +93,7 @@ export default function Schedule() {
       classGroups: classGroups.filter((group) => value.includes(group.value)).map((group) => group.label)
     };
     AsyncStorage.setItem("selection", JSON.stringify(newSelection));
+    queryClient.setQueryData(["selection"], newSelection);
   }
 
   const animationDistance = 150;
