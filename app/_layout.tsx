@@ -5,7 +5,7 @@ import { getBackgroundColor } from "../src/utils/color";
 import { Accent1 } from "../src/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect } from "react";
-import { setStatusBarStyle } from "expo-status-bar";
+import { setStatusBarStyle, StatusBar } from "expo-status-bar";
 import { Try } from "expo-router/build/views/Try";
 import { ErrorBoundary } from "../src/utils/error_boundary";
 import { ScheduleData } from "../src/utils/edupage";
@@ -55,18 +55,21 @@ export default function Layout() {
   }, []);
 
   return (
-    <Try catch={ErrorBoundary}>
-      <QueryClientProvider client={queryClient}>
-        <Stack
-          screenOptions={{
-            contentStyle: { backgroundColor: getBackgroundColor(scheme) },
-            headerStyle: { backgroundColor: Accent1 },
-            headerTintColor: "white"
-          }}
-        >
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }}></Stack.Screen>
-        </Stack>
-      </QueryClientProvider>
-    </Try>
+    <>
+      <Try catch={ErrorBoundary}>
+        <QueryClientProvider client={queryClient}>
+          <Stack
+            screenOptions={{
+              contentStyle: { backgroundColor: getBackgroundColor(scheme) },
+              headerStyle: { backgroundColor: Accent1 },
+              headerTintColor: "white"
+            }}
+          >
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }}></Stack.Screen>
+          </Stack>
+        </QueryClientProvider>
+      </Try>
+      <StatusBar translucent={true} style="light"></StatusBar>
+    </>
   );
 }

@@ -44,6 +44,7 @@ export default function TabLayout() {
           headerShown: true,
           title: "Ustawienia",
           headerTintColor: "white",
+          tabBarIconStyle: { marginTop: 5 },
           tabBarIcon: ({ color }) => <FontAwesome size={24} name="cog" color={color} />,
           headerStyle: {
             backgroundColor: Accent1
@@ -58,7 +59,8 @@ export default function TabLayout() {
                   foreground: true
                 }}
                 style={{
-                  marginLeft: 12
+                  marginLeft: 12,
+                  marginRight: 12
                 }}
                 onPress={() => router.back()}
               >
