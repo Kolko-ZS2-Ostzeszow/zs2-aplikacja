@@ -1,14 +1,14 @@
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
 import { Appearance, useColorScheme } from "react-native";
-import { getBackgroundColor } from "../utils/color";
-import { Accent1 } from "../theme";
+import { getBackgroundColor } from "../src/utils/color";
+import { Accent1 } from "../src/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect } from "react";
 import { setStatusBarStyle } from "expo-status-bar";
 import { Try } from "expo-router/build/views/Try";
-import { ErrorBoundary } from "../utils/error_boundary";
-import { ScheduleData } from "../utils/edupage";
+import { ErrorBoundary } from "../src/utils/error_boundary";
+import { ScheduleData } from "../src/utils/edupage";
 
 SplashScreen.preventAutoHideAsync();
 

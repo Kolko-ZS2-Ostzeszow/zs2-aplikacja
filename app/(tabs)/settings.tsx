@@ -1,6 +1,6 @@
 import { Appearance, ColorSchemeName, Text, View, useColorScheme } from "react-native";
-import { RadioGroup } from "../../components/radio_group";
-import { getTextColor } from "../../utils/color";
+import { RadioGroup } from "../../src/components/radio_group";
+import { getTextColor } from "../../src/utils/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery } from "@tanstack/react-query";
 import { setStatusBarStyle } from "expo-status-bar";
