@@ -1,5 +1,5 @@
 import { FlatList, Pressable, RefreshControl, Text, View, useColorScheme } from "react-native";
-import { Days, fetchEdupageSchedule, ScheduleData } from "../../src/utils/edupage";
+import { Days, fetchEdupageSchedule, ScheduleData } from "../../src/misc/edupage";
 import { useState } from "react";
 import Lesson from "../../src/components/lesson";
 import { Accent1, Accent2 } from "../../src/theme";
@@ -13,8 +13,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Animated, { FadeIn, FadeOut, LinearTransition, useSharedValue, withTiming } from "react-native-reanimated";
-import { getBestDayId } from "../../src/utils/get_best_day";
-import { useSchedule } from "../../src/utils/use_schedule";
+import { getBestDayId } from "../../src/misc/get_best_day";
+import { useSchedule } from "../../src/misc/use_schedule";
 
 export default function Schedule() {
   const scheme = useColorScheme();

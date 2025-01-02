@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchSubstitutionData } from "../../src/utils/edupage";
+import { fetchSubstitutionData } from "../../src/misc/edupage";
 import { FlatList, Pressable, Text, View, useColorScheme } from "react-native";
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import { Accent1, DarkFg } from "../../src/theme";
-import { getBackgroundColor, getTextColor } from "../../src/utils/color";
+import { getBackgroundColor, getTextColor } from "../../src/misc/color";
 import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { throttle } from "../../src/utils/throttle";
+import { throttle } from "../../src/misc/throttle";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
