@@ -35,7 +35,10 @@ export async function fetchEdupageSchedule() {
     await (
       await fetch("https://zs2ostrzeszow.edupage.org/timetable/server/ttviewer.js?__func=getTTViewerData", {
         method: "POST",
-        body: JSON.stringify({ __args: [null, new Date().getFullYear()], __gsh: "00000000" })
+        body: JSON.stringify({
+          __args: [null, new Date().getMonth() >= 8 ? new Date().getFullYear() : new Date().getFullYear() - 1],
+          __gsh: "00000000"
+        })
       })
     ).json()
   ).r.regular.default_num;
