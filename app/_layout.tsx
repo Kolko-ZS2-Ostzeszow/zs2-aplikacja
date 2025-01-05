@@ -1,14 +1,15 @@
-import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryCache, QueryClient, QueryClientProvider, useQuery, UseQueryResult } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
 import { Appearance, useColorScheme } from "react-native";
 import { getBackgroundColor } from "../src/misc/color";
 import { Accent1 } from "../src/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect } from "react";
+import { createContext, useEffect } from "react";
 import { setStatusBarStyle, StatusBar } from "expo-status-bar";
 import { Try } from "expo-router/build/views/Try";
 import { ErrorBoundary } from "../src/misc/error_boundary";
 import { ScheduleData } from "../src/misc/edupage";
+import { updateServerUrl } from "../config";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,6 +30,29 @@ queryClient.prefetchQuery({
   },
   queryKey: ["schedule-cache"]
 });
+
+export const UpdateContext = createContext<UseQueryResult>(null);
+
+const UpdateProvider = ({ children }) => {
+  const updateQuery = useQuery(
+    {
+      queryFn: async () => {
+        try {
+          if (updateServerUrl == null || updateServerUrl == undefined || updateServerUrl.trim() == "") return null;
+
+          const updateInfo = await (await fetch(updateServerUrl)).json();
+          return updateInfo;
+        } catch (error) {
+          return null;
+        }
+      },
+      initialData: null,
+      queryKey: ["update"]
+    },
+    queryClient
+  );
+  return <UpdateContext.Provider value={updateQuery}>{children}</UpdateContext.Provider>;
+};
 
 export default function Layout() {
   const scheme = useColorScheme();
@@ -56,19 +80,21 @@ export default function Layout() {
 
   return (
     <>
-      <Try catch={ErrorBoundary}>
-        <QueryClientProvider client={queryClient}>
-          <Stack
-            screenOptions={{
-              contentStyle: { backgroundColor: getBackgroundColor(scheme) },
-              headerStyle: { backgroundColor: Accent1 },
-              headerTintColor: "white"
-            }}
-          >
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }}></Stack.Screen>
-          </Stack>
-        </QueryClientProvider>
-      </Try>
+      <UpdateProvider>
+        <Try catch={ErrorBoundary}>
+          <QueryClientProvider client={queryClient}>
+            <Stack
+              screenOptions={{
+                contentStyle: { backgroundColor: getBackgroundColor(scheme) },
+                headerStyle: { backgroundColor: Accent1 },
+                headerTintColor: "white"
+              }}
+            >
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }}></Stack.Screen>
+            </Stack>
+          </QueryClientProvider>
+        </Try>
+      </UpdateProvider>
       <StatusBar translucent={true} style="light"></StatusBar>
     </>
   );

@@ -3,9 +3,16 @@ import { router, Tabs } from "expo-router";
 import { Pressable, useColorScheme } from "react-native";
 import { getBackgroundColor } from "../../src/misc/color";
 import { Accent1 } from "../../src/theme";
+import React, { useContext, useEffect } from "react";
+import { UpdateContext } from "../_layout";
 
 export default function TabLayout() {
   const scheme = useColorScheme();
+  const updateQuery = useContext(UpdateContext);
+
+  useEffect(() => {
+    if (updateQuery.isFetching || updateQuery.data == null) return;
+  }, [updateQuery]);
 
   return (
     <Tabs
@@ -45,6 +52,7 @@ export default function TabLayout() {
           title: "Ustawienia",
           headerTintColor: "white",
           tabBarIconStyle: { marginTop: 5 },
+          tabBarBadge: updateQuery.data != null ? 1 : null,
           tabBarIcon: ({ color }) => <FontAwesome size={24} name="cog" color={color} />,
           headerStyle: {
             backgroundColor: Accent1
