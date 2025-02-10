@@ -15,6 +15,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Animated, { FadeIn, FadeOut, LinearTransition, useSharedValue, withTiming } from "react-native-reanimated";
 import { getBestDayId } from "../../src/misc/get_best_day";
 import { useSchedule } from "../../src/misc/use_schedule";
+import { getTextColor } from "../../src/misc/color";
 
 export default function Schedule() {
   const scheme = useColorScheme();
@@ -48,6 +49,7 @@ export default function Schedule() {
       let data = await AsyncStorage.getItem("selection");
       if (data == null) return null;
 
+      return null;
       return JSON.parse(data) as Selection;
     },
     queryKey: ["selection"]
@@ -261,7 +263,7 @@ export default function Schedule() {
           </Animated.View>
         )}
       </Animated.View>
-      {currentData != undefined && (
+      {currentData != undefined && ( selectedClass != null ? (
         <FlatList
           data={lessons}
           renderItem={({ item, index }) => {
@@ -282,6 +284,10 @@ export default function Schedule() {
           }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}></RefreshControl>}
         />
+      ) : (
+        <Text style={{color: getTextColor(scheme), fontSize: 24, marginHorizontal: "auto", marginVertical: 48, width: "70%", textAlign: "center"}}>
+          Rozwiń górny pasek i wybierz klasę
+        </Text>)
       )}
     </View>
   );
