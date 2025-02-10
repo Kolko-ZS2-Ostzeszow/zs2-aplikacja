@@ -49,7 +49,6 @@ export default function Schedule() {
       let data = await AsyncStorage.getItem("selection");
       if (data == null) return null;
 
-      return null;
       return JSON.parse(data) as Selection;
     },
     queryKey: ["selection"]
