@@ -1,0 +1,28 @@
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "gradle"
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - run: npm ci
+      - run: npx expo prebuild --clean --platform android
+      - run: ./gradlew --no-daemon packageRelease
+        working-directory: "android"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zs2-aplikacja.apk
+          path: ./android/app/build/outputs/apk/release/app-release.apk
