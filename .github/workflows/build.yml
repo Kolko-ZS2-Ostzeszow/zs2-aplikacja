@@ -22,9 +22,10 @@ jobs:
       - run: npx expo prebuild --clean --platform android
       - run: ./gradlew --no-daemon packageRelease
         working-directory: "android"
+      - run: mv ./android/app/build/outputs/apk/release/app-release.apk ./zs2-aplikacja.apk
       - uses: actions/upload-artifact@v4
         with:
           name: build
           path: |
-            ./android/app/build/outputs/apk/release/app-release.apk
+            ./zs2-aplikacja.apk
             ./app.json
