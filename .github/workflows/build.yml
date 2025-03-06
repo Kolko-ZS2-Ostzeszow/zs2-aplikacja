@@ -18,6 +18,8 @@ jobs:
           cache: "gradle"
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          log-accepted-android-sdk-licenses: false
       - run: npm ci
       - run: npx expo prebuild --clean --platform android
       - run: ./gradlew --no-daemon packageRelease
