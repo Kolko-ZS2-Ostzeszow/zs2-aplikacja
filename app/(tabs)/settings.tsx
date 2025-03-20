@@ -1,4 +1,4 @@
-import { Appearance, ColorSchemeName, Pressable, Text, View, useColorScheme } from "react-native";
+import { Appearance, ColorSchemeName, Linking, Pressable, Text, View, useColorScheme } from "react-native";
 import { RadioGroup } from "../../src/components/radio_group";
 import { getTextColor } from "../../src/misc/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -7,6 +7,8 @@ import { setStatusBarStyle } from "expo-status-bar";
 import { UpdateContext } from "../_layout";
 import { useContext } from "react";
 import { Accent1 } from "../../src/theme";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { updateApiUrl } from "../../config";
 
 export default function Settings() {
   const scheme = useColorScheme();
@@ -59,12 +61,23 @@ export default function Settings() {
       <View>
         {updateQuery.data != null && (
           <View>
-            <Text style={{ color: getTextColor(scheme), padding: 8, fontSize: 14 }}>
+            <Text style={{ color: getTextColor(scheme), padding: 8, fontSize: 14, paddingBottom: 0 }}>
               Dostępna jest nowa aktualizacja
             </Text>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={{ color: getTextColor(scheme), padding: 8, fontSize: 14 }}>{updateQuery.data?.current}</Text>
+              <FontAwesome
+                size={24}
+                name="long-arrow-right"
+                color={"white"}
+                style={{ alignSelf: "center" }}
+              ></FontAwesome>
+              <Text style={{ color: getTextColor(scheme), padding: 8, fontSize: 14 }}>{updateQuery.data?.new}</Text>
+            </View>
             <Pressable
               style={{ padding: 8, backgroundColor: Accent1, marginHorizontal: 16, borderRadius: 8 }}
               android_ripple={{ radius: 190, color: "#ffffff77" }}
+              onPress={() => Linking.openURL(updateApiUrl + "/download")}
             >
               <Text style={{ color: getTextColor(scheme), padding: 8, fontSize: 14, textAlign: "center" }}>
                 Pobierz

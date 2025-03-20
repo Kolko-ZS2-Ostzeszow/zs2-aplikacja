@@ -52,7 +52,7 @@ export default function TabLayout() {
           title: "Ustawienia",
           headerTintColor: "white",
           tabBarIconStyle: { marginTop: 5 },
-          tabBarBadge: updateQuery.data != null ? "!" : null,
+          tabBarBadge: updateQuery.data?.shouldUpdate ? "!" : null,
           tabBarIcon: ({ color }) => <FontAwesome size={24} name="cog" color={color} />,
           headerStyle: {
             backgroundColor: Accent1
