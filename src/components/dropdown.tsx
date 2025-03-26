@@ -9,6 +9,7 @@ interface DropdownProps {
   placeholder: string;
   searchPlaceholder: string;
   placeholderStyle?: TextStyle;
+  search?: boolean;
 }
 
 const DropdownComponent = (props: DropdownProps) => {
@@ -20,7 +21,7 @@ const DropdownComponent = (props: DropdownProps) => {
       inputSearchStyle={styles.inputSearchStyle}
       iconStyle={styles.iconStyle}
       data={props.data}
-      search
+      search={props.search}
       maxHeight={300}
       labelField="label"
       valueField="value"
@@ -49,14 +50,15 @@ const styles = StyleSheet.create({
   dropdown: {
     margin: 16,
     height: 50,
-    borderBottomColor: "gray",
+    borderBottomColor: "lightgray",
     borderBottomWidth: 0.5
   },
   icon: {
     marginRight: 5
   },
   placeholderStyle: {
-    fontSize: 16
+    fontSize: 16,
+    color: "white"
   },
   selectedTextStyle: {
     fontSize: 16,

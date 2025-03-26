@@ -175,9 +175,7 @@ export default function Schedule() {
               setExternalValue={setClass}
               placeholder="Wybierz klasę"
               searchPlaceholder="Szukaj..."
-              placeholderStyle={{
-                color: "gray"
-              }}
+              search
             ></DropdownComponent>
             <MultiDropdownComponent
               data={classGroups}
@@ -185,9 +183,6 @@ export default function Schedule() {
               externalValue={selectedGroups}
               placeholder="Wybierz grupę"
               searchPlaceholder="Szukaj..."
-              placeholderStyle={{
-                color: "gray"
-              }}
             ></MultiDropdownComponent>
           </Animated.View>
         )}
@@ -262,32 +257,42 @@ export default function Schedule() {
           </Animated.View>
         )}
       </Animated.View>
-      {currentData != undefined && ( selectedClass != null ? (
-        <FlatList
-          data={lessons}
-          renderItem={({ item, index }) => {
-            return (
-              <View style={{ marginTop: 12, marginBottom: 10 }}>
-                <Text style={{ color: scheme === "light" ? "black" : "white", marginLeft: 2, marginBottom: 2 }}>
-                  {currentData.hours[item.hourId].startTime + "-" + currentData.hours[item.hourId].endTime}
-                </Text>
-                <Lesson
-                  id={item.hourId + 1}
-                  name={item.name}
-                  classroom={item.classroom}
-                  teacher={item.teacher}
-                  group={item.group}
-                />
-              </View>
-            );
-          }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}></RefreshControl>}
-        />
-      ) : (
-        <Text style={{color: getTextColor(scheme), fontSize: 24, marginHorizontal: "auto", marginVertical: 48, width: "70%", textAlign: "center"}}>
-          Rozwiń górny pasek i wybierz klasę
-        </Text>)
-      )}
+      {currentData != undefined &&
+        (selectedClass != null ? (
+          <FlatList
+            data={lessons}
+            renderItem={({ item, index }) => {
+              return (
+                <View style={{ marginTop: 12, marginBottom: 10 }}>
+                  <Text style={{ color: scheme === "light" ? "black" : "white", marginLeft: 2, marginBottom: 2 }}>
+                    {currentData.hours[item.hourId].startTime + "-" + currentData.hours[item.hourId].endTime}
+                  </Text>
+                  <Lesson
+                    id={item.hourId + 1}
+                    name={item.name}
+                    classroom={item.classroom}
+                    teacher={item.teacher}
+                    group={item.group}
+                  />
+                </View>
+              );
+            }}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}></RefreshControl>}
+          />
+        ) : (
+          <Text
+            style={{
+              color: getTextColor(scheme),
+              fontSize: 24,
+              marginHorizontal: "auto",
+              marginVertical: 48,
+              width: "70%",
+              textAlign: "center"
+            }}
+          >
+            Rozwiń górny pasek i wybierz klasę
+          </Text>
+        ))}
     </View>
   );
 }
