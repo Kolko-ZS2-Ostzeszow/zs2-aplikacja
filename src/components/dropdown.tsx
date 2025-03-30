@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, TextInput, TextStyle } from "react-native";
+import { StyleSheet, TextInput, TextStyle, ViewStyle } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
 interface DropdownProps {
@@ -8,6 +8,7 @@ interface DropdownProps {
   setExternalValue: (value: number) => void;
   placeholder: string;
   searchPlaceholder: string;
+  style?: ViewStyle;
   placeholderStyle?: TextStyle;
   search?: boolean;
 }
@@ -15,7 +16,7 @@ interface DropdownProps {
 const DropdownComponent = (props: DropdownProps) => {
   return (
     <Dropdown
-      style={styles.dropdown}
+      style={props.style ? props.style : styles.dropdown}
       placeholderStyle={props.placeholderStyle ? props.placeholderStyle : styles.placeholderStyle}
       selectedTextStyle={styles.selectedTextStyle}
       inputSearchStyle={styles.inputSearchStyle}
