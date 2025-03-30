@@ -7,7 +7,7 @@ interface DropdownProps {
   externalValue: any;
   setExternalValue: (value: number) => void;
   placeholder: string;
-  searchPlaceholder: string;
+  searchPlaceholder?: string;
   style?: ViewStyle;
   placeholderStyle?: TextStyle;
   search?: boolean;
