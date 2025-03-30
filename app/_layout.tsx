@@ -88,19 +88,19 @@ export default function Layout() {
   return (
     <>
       <UpdateProvider>
-        <Try catch={ErrorBoundary}>
-          <QueryClientProvider client={queryClient}>
-            <Stack
-              screenOptions={{
-                contentStyle: { backgroundColor: getBackgroundColor(scheme) },
-                headerStyle: { backgroundColor: Accent1 },
-                headerTintColor: "white"
-              }}
-            >
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }}></Stack.Screen>
-            </Stack>
-          </QueryClientProvider>
-        </Try>
+        <QueryClientProvider client={queryClient}>
+          <Stack
+            screenOptions={{
+              contentStyle: { backgroundColor: getBackgroundColor(scheme) },
+              headerStyle: { backgroundColor: Accent1 },
+              headerTintColor: "white"
+            }}
+            initialRouteName="(tabs)"
+          >
+            <Stack.Screen name="error_reporting" options={{ headerTitle: "Zgłoś błąd" }}></Stack.Screen>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }}></Stack.Screen>
+          </Stack>
+        </QueryClientProvider>
       </UpdateProvider>
       <StatusBar translucent={true} style="light"></StatusBar>
     </>

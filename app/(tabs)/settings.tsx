@@ -9,10 +9,12 @@ import { useContext } from "react";
 import { Accent1 } from "../../src/theme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { updateApiUrl } from "../../config";
+import { useRouter } from "expo-router";
 
 export default function Settings() {
   const scheme = useColorScheme();
   const updateQuery = useContext(UpdateContext);
+  const router = useRouter();
   const savedSelectedTheme = useQuery({
     queryFn: async () => {
       return JSON.parse(await AsyncStorage.getItem("theme"));
@@ -90,6 +92,18 @@ export default function Settings() {
             Nie ma żadnych nowych aktualizacji
           </Text>
         )}
+      </View>
+      <View>
+        <Text style={{ color: getTextColor(scheme), padding: 8, fontSize: 16, fontWeight: 700 }}>Zgłoś błąd</Text>
+        <View style={{ margin: 8, borderRadius: 8, overflow: "hidden" }}>
+          <Pressable
+            style={{ backgroundColor: Accent1, padding: 12, borderRadius: 8 }}
+            android_ripple={{ radius: 200, color: "#ffffff77" }}
+            onPress={() => router.navigate("/error_reporting")}
+          >
+            <Text style={{ color: "white", textAlign: "center" }}>Otwórz</Text>
+          </Pressable>
+        </View>
       </View>
     </View>
   );
