@@ -5,6 +5,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      EXPO_PUBLIC_REPORTING_API_URL: ${{ vars.EXPO_PUBLIC_REPORTING_API_URL }}
+      EXPO_PUBLIC_UPDATE_API_URL: ${{ vars.EXPO_PUBLIC_UPDATE_API_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
