@@ -11,6 +11,8 @@ jobs:
         with:
           node-version: 22
           cache: "npm"
+      - run: npm ci
+      - run: npx expo prebuild --clean --platform android
       - uses: actions/setup-java@v4
         with:
           distribution: "temurin"
@@ -20,8 +22,6 @@ jobs:
         uses: android-actions/setup-android@v3
         with:
           log-accepted-android-sdk-licenses: false
-      - run: npm ci
-      - run: npx expo prebuild --clean --platform android
       - run: ./gradlew --no-daemon packageRelease
         working-directory: "android"
       - run: mv ./android/app/build/outputs/apk/release/app-release.apk ./zs2-aplikacja.apk
