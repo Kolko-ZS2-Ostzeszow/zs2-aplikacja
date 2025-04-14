@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, TextInput, TextStyle } from "react-native";
+import { StyleSheet, TextInput, TextStyle, ViewStyle } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
 interface DropdownProps {
@@ -7,20 +7,22 @@ interface DropdownProps {
   externalValue: any;
   setExternalValue: (value: number) => void;
   placeholder: string;
-  searchPlaceholder: string;
+  searchPlaceholder?: string;
+  style?: ViewStyle;
   placeholderStyle?: TextStyle;
+  search?: boolean;
 }
 
 const DropdownComponent = (props: DropdownProps) => {
   return (
     <Dropdown
-      style={styles.dropdown}
+      style={props.style ? props.style : styles.dropdown}
       placeholderStyle={props.placeholderStyle ? props.placeholderStyle : styles.placeholderStyle}
       selectedTextStyle={styles.selectedTextStyle}
       inputSearchStyle={styles.inputSearchStyle}
       iconStyle={styles.iconStyle}
       data={props.data}
-      search
+      search={props.search}
       maxHeight={300}
       labelField="label"
       valueField="value"
@@ -49,14 +51,15 @@ const styles = StyleSheet.create({
   dropdown: {
     margin: 16,
     height: 50,
-    borderBottomColor: "gray",
+    borderBottomColor: "lightgray",
     borderBottomWidth: 0.5
   },
   icon: {
     marginRight: 5
   },
   placeholderStyle: {
-    fontSize: 16
+    fontSize: 16,
+    color: "white"
   },
   selectedTextStyle: {
     fontSize: 16,

@@ -1,9 +1,11 @@
-import { ErrorBoundaryProps } from "expo-router";
+import { ErrorBoundaryProps, useRouter } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Clipboard from "expo-clipboard";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  const router = useRouter();
+
   //TODO: Automatically send errors to us
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "black", justifyContent: "space-between" }}>
@@ -44,6 +46,16 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
           onPress={retry}
         >
           <Text style={{ color: "white", padding: 16 }}>Odśwież</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => (pressed ? { backgroundColor: "#444444" } : { backgroundColor: "#222222" })}
+          onPress={() =>
+            router.navigate(
+              `/error_reporting?errorParam=${encodeURIComponent(JSON.stringify({ name: error.name, message: error.message, cause: error.cause, stack: error.stack }))}`
+            )
+          }
+        >
+          <Text style={{ color: "white", padding: 16 }}>Zgłoś błąd</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => (pressed ? { backgroundColor: "#444444" } : { backgroundColor: "#222222" })}
