@@ -12,7 +12,9 @@ jobs:
           node-version: 22
           cache: "npm"
       - name: Generate .env file
-        run: echo "EXPO_PUBLIC_REPORTING_API_URL=\"${{ vars.EXPO_PUBLIC_REPORTING_API_URL }}\"\nEXPO_PUBLIC_UPDATE_API_URL=\"${{ vars.EXPO_PUBLIC_UPDATE_API_URL }}\"" > ./.env
+        run: |
+          echo "EXPO_PUBLIC_UPDATE_API_URL=\"${{ secrets.EXPO_PUBLIC_UPDATE_API_URL }}\"" > ./.env
+          echo "EXPO_PUBLIC_REPORTING_API_URL=\"${{ secrets.EXPO_PUBLIC_REPORTING_API_URL }}\"" >> ./.env
       - run: npm ci
       - run: npx expo prebuild --clean --platform android
       - uses: actions/setup-java@v4
